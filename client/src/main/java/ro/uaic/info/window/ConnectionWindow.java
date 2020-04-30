@@ -3,6 +3,8 @@ package ro.uaic.info.window;
 import com.github.javafaker.Faker;
 import ro.uaic.info.net.Connection;
 import ro.uaic.info.window.state.ConnectionWindowStates;
+import ro.uaic.info.window.state.MessageWindowStates;
+import ro.uaic.info.window.type.MessageWindowType;
 
 import javax.swing.*;
 import java.awt.*;
@@ -62,6 +64,19 @@ public class ConnectionWindow extends JFrame {
         );
     }
 
+    private String getEmptyFieldError(){
+        String message = "";
+
+        if(this.ipAddressLineEdit.getText().isEmpty())
+            message += "IP Address cannot be empty!\n";
+        if(this.portLineEdit.getText().isEmpty())
+            message += "Port cannot be empty!\n";
+        if(this.usernameLineEdit.getText().isEmpty())
+            message += "Username cannot be emtpy";
+
+        return message;
+    }
+
     public ConnectionWindowStates run(){
         this.buildWindow();
         this.buildGroups();
@@ -69,8 +84,27 @@ public class ConnectionWindow extends JFrame {
 
         this.setVisible(true);
 
-        //noinspection StatementWithEmptyBody
-        while(this.windowStatus == ConnectionWindowStates.WINDOW_ACTIVE);
+        while(true) {
+            //noinspection StatementWithEmptyBody
+            while (this.windowStatus == ConnectionWindowStates.WINDOW_ACTIVE) ;
+
+            if(this.windowStatus == ConnectionWindowStates.WINDOW_CLOSED_CONFIRM) {
+                if (this.anyFieldEmpty()) {
+                    MessageWindowStates response = new MessageWindow(this, MessageWindowType.MESSAGE_WINDOW_ACKNOWLEDGE)
+                            .setMessageDetailedText(this.getEmptyFieldError())
+                            .run();
+
+                    System.out.println(response);
+                    this.windowStatus = ConnectionWindowStates.WINDOW_ACTIVE;
+                }
+                else if(!this.anyFieldEmpty())
+                    break;
+            }
+            else{
+                if(this.windowStatus != ConnectionWindowStates.WINDOW_ACTIVE)
+                    break;
+            }
+        }
 
         this.setVisible(false);
 
@@ -97,6 +131,13 @@ public class ConnectionWindow extends JFrame {
 
     private void cancel(){
         this.windowStatus = ConnectionWindowStates.WINDOW_CLOSED_CANCEL;
+    }
+
+    private boolean anyFieldEmpty(){
+        return
+            this.usernameLineEdit.getText().isEmpty() ||
+            this.ipAddressLineEdit.getText().isEmpty() ||
+            this.portLineEdit.getText().isEmpty();
     }
 
     private void confirm(){

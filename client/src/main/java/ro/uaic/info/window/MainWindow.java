@@ -44,9 +44,7 @@ public class MainWindow extends JFrame {
     }
 
     public void run(){
-        ConnectionWindow connectionWindow = new ConnectionWindow(this);
-
-        ConnectionWindowStates connectionWindowReturn = connectionWindow.run();
+        ConnectionWindowStates connectionWindowReturn = new ConnectionWindow(this).run();
 
         if(connectionWindowReturn != ConnectionWindowStates.WINDOW_CLOSED_CONFIRM){
             this.close();
