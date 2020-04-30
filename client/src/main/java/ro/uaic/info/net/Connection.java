@@ -85,7 +85,7 @@ public class Connection {
             this.isConnected = true;
         }
         catch (IOException exception){
-            System.err.println("Connection refused " + exception);
+            System.err.println("Connection refused " + exception + ". Server might be offline");
         }
     }
 
