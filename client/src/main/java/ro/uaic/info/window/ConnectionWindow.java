@@ -82,9 +82,11 @@ public class ConnectionWindow extends JFrame {
         this.buildGroups();
         this.buildListeners();
 
-        this.setVisible(true);
 
         while(true) {
+
+            this.setVisible(true);
+
             //noinspection StatementWithEmptyBody
             while (this.windowStatus == ConnectionWindowStates.WINDOW_ACTIVE) ;
 

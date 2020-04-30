@@ -74,6 +74,10 @@ public class Connection {
 
     }
 
+    public boolean isConnected(){
+        return this.isConnected;
+    }
+
     public void connect(){
         if(this.isConnected){
             System.out.println("Close previous connection first! Call .disconnect()");

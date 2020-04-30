@@ -2,6 +2,8 @@ package ro.uaic.info.window;
 
 import ro.uaic.info.net.Connection;
 import ro.uaic.info.window.state.ConnectionWindowStates;
+import ro.uaic.info.window.state.MessageWindowStates;
+import ro.uaic.info.window.type.MessageWindowType;
 
 import javax.swing.*;
 import java.awt.*;
@@ -44,18 +46,57 @@ public class MainWindow extends JFrame {
     }
 
     public void run(){
-        ConnectionWindowStates connectionWindowReturn = new ConnectionWindow(this).run();
-
-        if(connectionWindowReturn != ConnectionWindowStates.WINDOW_CLOSED_CONFIRM){
-            this.close();
-        }
+        boolean showReconnect = false;
 
         this.buildWindow();
+
+        do {
+            if(showReconnect){
+                MessageWindowStates messageWindowStatus = new MessageWindow(this, MessageWindowType.MESSAGE_WINDOW_ACKNOWLEDGE)
+                        .setMessageText("Connection Failed!")
+                        .setMessageDetailedText("Server might be down")
+                        .run();
+            }
+
+            ConnectionWindow connectionWindow = new ConnectionWindow(this);
+            ConnectionWindowStates connectionWindowReturn = connectionWindow.run();
+
+            if (connectionWindowReturn != ConnectionWindowStates.WINDOW_CLOSED_CONFIRM) {
+                this.close();
+            }
+
+            this.buildConnection(
+                    connectionWindow.getInputIpAddress(),
+                    Integer.parseInt(connectionWindow.getInputPort()),
+                    connectionWindow.getInputUsername(),
+                    true
+            );
+
+            showReconnect = true;
+        }while(!this.connection.isConnected());
+
+        this.buildListeners();
 
         this.setVisible(true);
     }
 
-    public void buildWindow(){
+    private void buildConnection(String address, int port, String username, boolean debugMode){
+        this.username = username;
+
+        this.connection = new Connection.ConnectionFactory()
+                .withIPV4Address(address)
+                .withPort(port)
+                .withDebugMode(debugMode)
+                .build();
+
+        this.connection.connect();
+    }
+
+    private void buildListeners(){
+
+    }
+
+    private void buildWindow(){
         super.setBounds(
                 new Rectangle(
                         this.windowOffsetX,

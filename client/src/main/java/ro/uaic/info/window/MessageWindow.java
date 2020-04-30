@@ -1,7 +1,5 @@
 package ro.uaic.info.window;
 
-import org.w3c.dom.ls.LSOutput;
-import ro.uaic.info.window.state.ConnectionWindowStates;
 import ro.uaic.info.window.state.MessageWindowStates;
 import ro.uaic.info.window.type.MessageWindowType;
 
@@ -16,6 +14,8 @@ public class MessageWindow extends JFrame {
 
     private int windowWidth = MSG_WINDOW_DEFAULT_WIDTH;
     private int windowHeight = MSG_WINDOW_DEFAULT_HEIGHT;
+    private int offsetX;
+    private int offsetY;
 
     private final JFrame parent;
 
@@ -32,15 +32,25 @@ public class MessageWindow extends JFrame {
     public MessageWindow(JFrame parent, MessageWindowType type){
         this.parent = parent;
         this.type = type;
-        System.out.println(this.type);
+
+        this.offsetX = this.parent.getX() + this.parent.getWidth()/2 - this.windowWidth/2;
+        this.offsetY = this.parent.getY() + this.parent.getHeight()/2 - this.windowHeight/2;
+    }
+
+    public MessageWindow(int x, int y, MessageWindowType type){
+        this.parent = null;
+        this.type = type;
+
+        this.offsetX = x;
+        this.offsetY = y;
     }
 
     private void buildWindow(){
         super.setTitle(messageText);
         super.setBounds(
                 new Rectangle(
-                        this.parent.getX() + this.parent.getWidth()/2 - this.windowWidth/2,
-                        this.parent.getY() + this.parent.getHeight()/2 - this.windowHeight/2,
+                        this.offsetX,
+                        this.offsetY,
                         this.windowWidth,
                         this.windowHeight
                 )
@@ -189,8 +199,6 @@ public class MessageWindow extends JFrame {
 
         this.setVisible(true);
 
-        System.out.println(this);
-
         //noinspection StatementWithEmptyBody
         while(this.state == MessageWindowStates.MESSAGE_WINDOW_ACTIVE);
 
@@ -198,7 +206,6 @@ public class MessageWindow extends JFrame {
 
         if(this.parent != null){
             this.parent.setEnabled(true);
-            this.parent.setVisible(true);
         }
 
         return this.state;
