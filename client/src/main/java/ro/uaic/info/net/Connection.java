@@ -7,6 +7,13 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+/**
+ * If used in server, use Connection c = new Connection.ConnectionFactory.withSocket(this.serverSocket.accept()).withDebugMode(true).build();
+ *      and after this, no connect() call is necessary.
+ *
+ * If used in client, use Connection c = new Connection.ConnectionFactory().withIPV4Address(Connection.LOCALHOST).withPort(Connection.DEFAULT_PORT).withDebugMode(true).build();
+ *      and after this, call connect() to use.
+ */
 public class Connection {
 
     public static final String  LOCALHOST       = "127.0.0.1";
@@ -25,6 +32,7 @@ public class Connection {
         private         String  serverAddress   = Connection.DEFAULT_ADDRESS;
         private         int     port            = Connection.DEFAULT_PORT;
         private         boolean activeDebug     = false;
+        private         Socket  socket          = null;
 
         public ConnectionFactory withIPV4Address(String address){
             this.serverAddress = address;
@@ -41,12 +49,22 @@ public class Connection {
             return this;
         }
 
+        public ConnectionFactory withSocket(Socket socket){
+            this.socket = socket;
+            return this;
+        }
+
         public Connection build(){
             Connection connection       = new Connection();
 
             connection.serverAddress    = this.serverAddress;
             connection.port             = this.port;
             connection.debugActive      = this.activeDebug;
+
+            if(this.socket != null) {
+                connection.socket       = this.socket;
+                connection.isConnected  = true;
+            }
 
             return connection;
         }
@@ -57,6 +75,11 @@ public class Connection {
     }
 
     public void connect(){
+        if(this.isConnected){
+            System.out.println("Close previous connection first! Call .disconnect()");
+            return;
+        }
+
         try {
             this.socket = new Socket(this.serverAddress, this.port);
             this.isConnected = true;

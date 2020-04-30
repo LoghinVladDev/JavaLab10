@@ -1,5 +1,7 @@
 package ro.uaic.info.server;
 
+import ro.uaic.info.net.Connection;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -7,45 +9,38 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 public class ClientThread extends Thread {
-    private Socket socket = null;
+    private Socket socket;
+    private Connection connection;
     private final int threadID;
+    private final boolean debuggingEnabled = true;
 
     public ClientThread(Socket socket, int threadID){
         this.socket = socket;
+        this.connection = new Connection.ConnectionFactory()
+                .withSocket(this.socket)
+                .withDebugMode(this.debuggingEnabled)
+                .build();
         this.threadID = threadID;
     }
 
     public void run(){
-        try{
-            BufferedReader in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
+        if(this.debuggingEnabled)
+            this.printMessage("Reading...");
 
-            this.printMessage("Waiting for message ... ");
+        String receivedMessage = this.connection.readMessage();
 
-            String request = in.readLine();
+        if(this.debuggingEnabled)
+            this.printMessage("Read...");
 
-            this.printMessage("Got message ... ");
+        if(this.debuggingEnabled)
+            this.printMessage("Writing...");
 
-            PrintWriter out = new PrintWriter(this.socket.getOutputStream());
-            String response = "Hello " + request + "!";
+        this.connection.writeMessage("Hello " + receivedMessage + "!");
 
-            this.printMessage("Sending message");
+        if(this.debuggingEnabled)
+            this.printMessage("Wrote...");
 
-            out.println(response);
-            out.flush();
-
-            this.printMessage("Message Sent!");
-        }
-        catch (IOException exception){
-            this.printError("Socket TCP communication error " + exception);
-        }
-        finally {
-            try{
-                this.socket.close();
-            }
-            catch (IOException exception){
-                this.printError("Socket closure error " + exception);
-            }
-        }
+        this.connection.disconnect();
     }
 
     public void printMessage(String message){
