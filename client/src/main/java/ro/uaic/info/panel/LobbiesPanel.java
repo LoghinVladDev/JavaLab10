@@ -113,18 +113,32 @@ public class LobbiesPanel extends JPanel {
         );
     }
 
+    public boolean lobbyExists(Lobby lobby){
+        for(int i = 0; i < this.lobbiesListModel.size(); i++)
+            if(lobby.getCreator().equals(this.lobbiesListModel.get(i)))
+                return true;
+        return false;
+    }
+
     public void updateLobbies(String JSONEncodedLobbies){
         //this.lobbiesListModel.addAll(this.decodeJSONLobbies(JSONEncodedLobbies));
 
-        this.lobbiesListModel.clear();
+        //this.lobbiesListModel.clear();
 
         List<Lobby> list = decodeJSONLobbies(JSONEncodedLobbies);
 
         int index = 0;
         if(list != null)
         for(Lobby lobby : list){
-            this.lobbiesListModel.add(index++, lobby.getCreator());
+            System.out.println(lobby);
+            if(!this.lobbyExists(lobby)){
+                this.lobbiesListModel.add(index++, lobby.getCreator());
+                System.out.println(lobby);
+            }
         }
+        for(int i = 0; i < this.lobbiesListModel.size(); i++)
+            if(!list.contains(new Lobby(this.lobbiesListModel.get(i))))
+                this.lobbiesListModel.remove(i);
     }
 
     private List<Lobby> decodeJSONLobbies(String json){
@@ -132,7 +146,7 @@ public class LobbiesPanel extends JPanel {
 
         String[] lobbies = json.split(",");
 
-        if(lobbies.length == 1)
+        if(lobbies.length == 1 && lobbies[0].charAt(1) != '{')
             return null;
 
         for (String lobby : lobbies) {

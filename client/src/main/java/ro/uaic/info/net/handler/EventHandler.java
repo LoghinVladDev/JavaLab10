@@ -83,7 +83,7 @@ public class EventHandler extends Thread {
 
         if(state.equals(ServerState.SENDING_MATCH_LIST)){
             String lobbyListString = this.parent.getConnection().readMessage();
-            //System.out.println(lobbyListString);
+            System.out.println(lobbyListString);
             this.parent.getMatchmakingPanel().getLobbiesPanel().updateLobbies(lobbyListString);
         }
     }

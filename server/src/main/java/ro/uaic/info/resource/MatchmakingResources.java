@@ -11,7 +11,8 @@ public class MatchmakingResources {
     }
 
     public void addLobby(Lobby lobby){
-        this.lobbyList.add(lobby);
+        if(!this.lobbyList.contains(lobby))
+            this.lobbyList.add(lobby);
     }
 
     public List<Lobby> getLobbyList() {
