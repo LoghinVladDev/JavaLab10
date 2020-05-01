@@ -1,6 +1,7 @@
 package ro.uaic.info.app;
 
 import ro.uaic.info.net.Connection;
+import ro.uaic.info.net.handler.EventHandler;
 import ro.uaic.info.window.MainWindow;
 
 public class ClientApp {

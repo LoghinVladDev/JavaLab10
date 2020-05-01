@@ -1,6 +1,8 @@
 package ro.uaic.info.window;
 
 import ro.uaic.info.net.Connection;
+import ro.uaic.info.net.handler.EventHandler;
+import ro.uaic.info.net.state.ClientState;
 import ro.uaic.info.panel.MatchmakingPanel;
 import ro.uaic.info.window.state.ConnectionWindowStates;
 import ro.uaic.info.window.state.MessageWindowStates;
@@ -10,6 +12,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Queue;
 
 public class MainWindow extends JFrame {
     public static final int APP_WINDOW_DEFAULT_WIDTH = 1366;
@@ -32,6 +35,14 @@ public class MainWindow extends JFrame {
     private JLabel connectionLabel;
     private JLabel usernameLabel;
     private JLabel pingLabel;
+
+    //private static Object lock = new Object();
+
+   // public static Object getLock() {
+    //    return lock;
+    //}
+
+    //private EventHandler messageHandler;
 
     public MainWindow(){
     }
@@ -86,10 +97,14 @@ public class MainWindow extends JFrame {
     }
 
     private void buildComponents(){
-        this.matchmakingPanel   = new MatchmakingPanel(this); // TODO: add here
+        //this.messageHandler = new EventHandler(this);
+        //this.messageHandler.start();
+
         this.connectionLabel    = new JLabel();
         this.pingLabel          = new JLabel();
         this.usernameLabel      = new JLabel();
+
+        this.matchmakingPanel   = new MatchmakingPanel(this); // TODO: add here
     }
 
     private void buildLayout(){
@@ -210,4 +225,8 @@ public class MainWindow extends JFrame {
     public int getWindowWidth() {
         return this.windowWidth;
     }
+
+    //public EventHandler getMessageHandler(){
+    //    return this.messageHandler;
+    //}
 }
