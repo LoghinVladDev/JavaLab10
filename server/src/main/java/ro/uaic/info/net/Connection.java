@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 
 /**
  * If used in server, use Connection c = new Connection.ConnectionFactory.withSocket(this.serverSocket.accept()).withDebugMode(true).build();
@@ -26,6 +27,9 @@ public class Connection {
     private             boolean isConnected     = false;
 
     private             boolean debugActive;
+
+    private             PrintWriter output;
+    private             BufferedReader input;
 
     public static class ConnectionFactory{
 
@@ -83,6 +87,33 @@ public class Connection {
         try {
             this.socket = new Socket(this.serverAddress, this.port);
             this.isConnected = true;
+
+            this.output = new PrintWriter(
+                    this.socket.getOutputStream(), true
+            );
+
+            this.input = new BufferedReader(
+                    new InputStreamReader(
+                            this.socket.getInputStream()
+                    )
+            );
+        }
+        catch (IOException exception){
+            System.err.println("Connection refused " + exception);
+        }
+    }
+
+    public void initializeBuffers(){
+        try {
+            this.output = new PrintWriter(
+                    this.socket.getOutputStream(), true
+            );
+
+            this.input = new BufferedReader(
+                    new InputStreamReader(
+                            this.socket.getInputStream()
+                    )
+            );
         }
         catch (IOException exception){
             System.err.println("Connection refused " + exception);
@@ -96,6 +127,7 @@ public class Connection {
         try{
             this.socket.close();
             this.isConnected = false;
+            System.out.println("Disconnected!");
         }
         catch (IOException exception){
             System.err.println("Connection close failure " + exception);
@@ -122,24 +154,33 @@ public class Connection {
         }
 
         try{
-            BufferedReader input = new BufferedReader(
-                    new InputStreamReader(
-                            this.socket.getInputStream()
-                    )
-            );
+            /*String message;
 
             if(this.debugActive)
                 System.out.println(" ... Waiting for message ... ");
 
-            return input.readLine();
+            char[] lengthArray = new char[32];
+            System.out.println("Read int :" +  input.read(lengthArray, 0, 32));
+            int length = Integer.parseInt(String.valueOf(lengthArray), 2);
+            char[] messageArray = new char[length];
+            int readLength = input.read(messageArray, 0, length);
+            message = String.valueOf(lengthArray);
+
+            if(this.debugActive)
+                System.out.println(" ... Got message ... " + message + ", expected length = " + ", actual length = " + readLength);
+
+             */
+
+            return this.input.readLine();
         }
         catch(UnknownHostException exception){
             System.err.println("No server listening " + exception);
+            this.isConnected = false;
             return null;
         }
         catch (IOException exception){
             System.err.println("Socket read failure " + exception);
-            this.disconnect();
+            this.isConnected = false;
             return null;
         }
     }
@@ -150,18 +191,23 @@ public class Connection {
             return;
         }
 
-        try{
-            PrintWriter output = new PrintWriter(
-                    this.socket.getOutputStream(), true
-            );
+        //try{
+            //char[] messageChar = message.toCharArray();
+            //int length = messageChar.length;
 
             if(this.debugActive)
-                System.out.println(" ... Writing message ... ");
+                System.out.println(" ... Writing message ... " + message);
 
-            output.println(message);
-        }
-        catch (IOException exception){
-            System.err.println("Socket write failure" + exception);
-        }
+            //output.println(message);
+            //output.flush();
+
+            //output.write(Arrays.copyOf(Integer.toBinaryString(length).toCharArray(),32), 0, 32);
+            //output.write(messageChar, 0, length);
+
+            this.output.println(message);
+        //}
+        //catch (IOException exception){
+        //    System.err.println("Socket write failure" + exception);
+        //}
     }
 }

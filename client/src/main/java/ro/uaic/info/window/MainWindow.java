@@ -46,6 +46,12 @@ public class MainWindow extends JFrame {
     public MainWindow(){
     }
 
+    public void setConnectionStatus(String status){
+        this.connectionStatus = status;
+        this.connectionLabel.setText(this.connectionStatus);
+
+    }
+
     private String updateConnectionStatus(){
         this.connectionStatus =
                 this.connection.isConnected() ?
@@ -60,7 +66,8 @@ public class MainWindow extends JFrame {
     }
 
     public void setPing(int ping){
-        this.ping = Integer.toString(ping);
+        this.ping = Integer.toString(ping) + " ms ping";
+        this.pingLabel.setText(this.ping);
     }
 
     public MainWindow(int width, int height){
@@ -93,13 +100,17 @@ public class MainWindow extends JFrame {
 
         this.setVisible(true);
 
-        System.out.println("Window Built...");
+        //System.out.println("Window Built...");
 
         this.buildListeners();
 
         this.matchmakingPanel.setFocusable(true);
         this.matchmakingPanel.grabFocus();
         this.matchmakingPanel.getLobbiesPanel().grabFocus();
+    }
+
+    public String getUsername(){
+        return this.username;
     }
 
     private void buildComponents(){
@@ -170,6 +181,10 @@ public class MainWindow extends JFrame {
         }while(!this.connection.isConnected());
     }
 
+    public MatchmakingPanel getMatchmakingPanel() {
+        return matchmakingPanel;
+    }
+
     private void buildConnection(String address, int port, String username, boolean debugMode){
         this.username = username;
 
@@ -190,25 +205,6 @@ public class MainWindow extends JFrame {
                     }
                 }
         );
-        this.addKeyListener(
-                new KeyListener() {
-                    @Override
-                    public void keyTyped(KeyEvent e) {
-
-                    }
-
-                    @Override
-                    public void keyPressed(KeyEvent e) {
-                        System.out.println(e.getKeyCode());
-                    }
-
-                    @Override
-                    public void keyReleased(KeyEvent e) {
-
-                    }
-                }
-        );
-
     }
 
     private void buildWindow(){
@@ -223,6 +219,7 @@ public class MainWindow extends JFrame {
     }
 
     public void close(String message, int status){
+        this.messageHandler.addToMessageQueue(ClientState.CLIENT_EXIT);
         System.out.println(message);
         System.exit(status);
     }

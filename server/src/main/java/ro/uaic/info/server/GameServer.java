@@ -1,5 +1,7 @@
 package ro.uaic.info.server;
 
+import ro.uaic.info.resource.MatchmakingResources;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 
@@ -15,17 +17,21 @@ public class GameServer {
     private ServerSocket serverSocket   = null;
     private boolean serverActive        = true;
 
+    private MatchmakingResources matchmakingResources;
+
     public void start(){
         if(this.serverSocket == null){
             System.err.println("Cannot start if socket is not bound, exit function");
             return;
         }
 
+        this.matchmakingResources = new MatchmakingResources();
+
         while(this.serverActive){
             System.out.println("Waiting for Client Connection...");
 
             try {
-                new ClientThread(this.serverSocket.accept(), ++this.threadCounter).start();
+                new ClientThread(this.serverSocket.accept(), ++this.threadCounter, this.matchmakingResources).start();
             }
             catch (IOException exception){
                 System.out.println("Accept failure " + exception);

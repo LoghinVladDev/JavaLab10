@@ -25,7 +25,7 @@ public class LobbySettingsPanel extends JPanel{
 
         this.buildPanel();
 
-        System.out.println("Lobby Settings Built...");
+        //System.out.println("Lobby Settings Built...");
     }
 
     private void buildPanel(){

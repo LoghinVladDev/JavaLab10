@@ -24,7 +24,7 @@ public class MatchmakingPanel extends JPanel {
 
         this.buildListeners();
 
-        System.out.println("Matchmaking Built...");
+        //System.out.println("Matchmaking Built...");
     }
 
     public LobbiesPanel getLobbiesPanel() {
@@ -77,9 +77,9 @@ public class MatchmakingPanel extends JPanel {
                 )
         );
 
-        System.out.println("L " + this.lobbyPanel.getBounds());
-        System.out.println("LS " + this.lobbySettingsPanel.getBounds());
-        System.out.println("LOBBIES " + this.lobbiesPanel.getBounds());
+        //System.out.println("L " + this.lobbyPanel.getBounds());
+        //System.out.println("LS " + this.lobbySettingsPanel.getBounds());
+        //System.out.println("LOBBIES " + this.lobbiesPanel.getBounds());
     }
 
     private void buildLayout(){

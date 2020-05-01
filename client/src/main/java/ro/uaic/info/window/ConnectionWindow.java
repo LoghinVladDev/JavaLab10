@@ -96,7 +96,7 @@ public class ConnectionWindow extends JFrame {
                             .setMessageDetailedText(this.getEmptyFieldError())
                             .run();
 
-                    System.out.println(response);
+                    //System.out.println(response);
                     this.windowStatus = ConnectionWindowStates.WINDOW_ACTIVE;
                 }
                 else if(!this.anyFieldEmpty())
