@@ -63,7 +63,25 @@ public class MatchmakingPanel extends JPanel {
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
 
+        layout.setHorizontalGroup(
+            layout.createSequentialGroup()
+                .addGroup(
+                    layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addComponent(this.lobbyPanel)
+                        .addComponent(this.lobbySettingsPanel)
+                )
+                .addComponent(this.lobbiesPanel)
+        );
 
+        layout.setVerticalGroup(
+            layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                .addGroup(
+                    layout.createSequentialGroup()
+                        .addComponent(this.lobbyPanel, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(this.lobbySettingsPanel, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                )
+                .addComponent(this.lobbiesPanel)
+        );
     }
 
     private void buildPanel(){
