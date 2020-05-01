@@ -135,10 +135,12 @@ public class Connection {
         }
         catch(UnknownHostException exception){
             System.err.println("No server listening " + exception);
+            this.isConnected = false;
             return null;
         }
         catch (IOException exception){
             System.err.println("Socket read failure " + exception);
+            this.isConnected = false;
             return null;
         }
     }
@@ -161,6 +163,7 @@ public class Connection {
         }
         catch (IOException exception){
             System.err.println("Socket write failure" + exception);
+            this.isConnected = false;
         }
     }
 }

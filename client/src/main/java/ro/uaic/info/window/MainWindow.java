@@ -1,12 +1,15 @@
 package ro.uaic.info.window;
 
 import ro.uaic.info.net.Connection;
+import ro.uaic.info.panel.MatchmakingPanel;
 import ro.uaic.info.window.state.ConnectionWindowStates;
 import ro.uaic.info.window.state.MessageWindowStates;
 import ro.uaic.info.window.type.MessageWindowType;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class MainWindow extends JFrame {
     public static final int APP_WINDOW_DEFAULT_WIDTH = 1366;
@@ -21,8 +24,33 @@ public class MainWindow extends JFrame {
 
     private String username;
     private Connection connection;
+    private String connectionStatus;
+    private String ping = "0";
+
+    private MatchmakingPanel matchmakingPanel;
+
+    private JLabel connectionLabel;
+    private JLabel usernameLabel;
+    private JLabel pingLabel;
 
     public MainWindow(){
+    }
+
+    private String updateConnectionStatus(){
+        this.connectionStatus =
+                this.connection.isConnected() ?
+                "Connected to server (" +
+                this.connection.getSocket().getInetAddress() +
+                ":" +
+                this.connection.getSocket().getPort() +
+                ")" :
+                "Disconnected";
+
+        return this.connectionStatus;
+    }
+
+    public void setPing(int ping){
+        this.ping = Integer.toString(ping);
     }
 
     public MainWindow(int width, int height){
@@ -46,10 +74,55 @@ public class MainWindow extends JFrame {
     }
 
     public void run(){
-        boolean showReconnect = false;
 
         this.buildWindow();
+        this.waitForConnection();
+        this.buildListeners();
 
+        this.buildComponents();
+        this.buildLayout();
+
+        this.setVisible(true);
+    }
+
+    private void buildComponents(){
+        this.matchmakingPanel   = new MatchmakingPanel(this); // TODO: add here
+        this.connectionLabel    = new JLabel();
+        this.pingLabel          = new JLabel();
+        this.usernameLabel      = new JLabel();
+    }
+
+    private void buildLayout(){
+        GroupLayout groupLayout = new GroupLayout(this.getContentPane());
+        this.getContentPane().setLayout(groupLayout);
+
+        this.connectionLabel.setText(this.updateConnectionStatus());
+        this.usernameLabel.setText(this.username);
+        this.pingLabel.setText(this.ping);
+
+        groupLayout.setHorizontalGroup(
+            groupLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                .addGroup(groupLayout.createSequentialGroup()
+                    .addComponent(this.connectionLabel, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(this.usernameLabel, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(this.pingLabel, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                )
+                .addComponent(this.matchmakingPanel)
+        );
+
+        groupLayout.setVerticalGroup(
+            groupLayout.createSequentialGroup()
+                .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(this.connectionLabel)
+                    .addComponent(this.usernameLabel)
+                    .addComponent(this.pingLabel)
+                )
+                .addComponent(this.matchmakingPanel)
+        );
+    }
+
+    private void waitForConnection(){
+        boolean showReconnect = false;
         do {
             if(showReconnect){
                 MessageWindowStates messageWindowStatus = new MessageWindow(this, MessageWindowType.MESSAGE_WINDOW_ACKNOWLEDGE)
@@ -74,10 +147,6 @@ public class MainWindow extends JFrame {
 
             showReconnect = true;
         }while(!this.connection.isConnected());
-
-        this.buildListeners();
-
-        this.setVisible(true);
     }
 
     private void buildConnection(String address, int port, String username, boolean debugMode){
@@ -93,7 +162,13 @@ public class MainWindow extends JFrame {
     }
 
     private void buildListeners(){
-
+        this.addWindowListener(
+                new WindowAdapter() {
+                    public void windowClosing(WindowEvent e){
+                        close("Client closed", 0);
+                    }
+                }
+        );
     }
 
     private void buildWindow(){

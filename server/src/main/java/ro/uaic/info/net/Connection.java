@@ -135,6 +135,7 @@ public class Connection {
         }
         catch (IOException exception){
             System.err.println("Socket read failure " + exception);
+            this.disconnect();
             return null;
         }
     }
