@@ -111,6 +111,10 @@ public class Connection {
         return this.socket;
     }
 
+    public boolean isConnected(){
+        return this.isConnected;
+    }
+
     public String readMessage(){
         if(!this.isConnected){
             System.err.println("Connection inactive. Have you called .connect()?");

@@ -8,6 +8,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 public class LobbiesPanel extends JPanel {
     private MatchmakingPanel parent;
@@ -24,6 +26,42 @@ public class LobbiesPanel extends JPanel {
     private DefaultListModel<String> lobbiesListModel;
     private JScrollPane scrollPane;
 
+    private void buildListeners(){
+        this.createLobbyPushButton.addMouseListener(
+                new MouseListener() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+
+                    }
+
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+
+                    }
+
+                    @Override
+                    public void mouseReleased(MouseEvent e) {
+                        createLobby();
+                    }
+
+                    @Override
+                    public void mouseEntered(MouseEvent e) {
+
+                    }
+
+                    @Override
+                    public void mouseExited(MouseEvent e) {
+
+                    }
+                }
+        );
+    }
+
+    private void createLobby(){
+        System.out.println("PRESSED BUTTON FFS");
+        this.parent.getParent().getMessageHandler().addToMessageQueue(ClientState.CREATE_LOBBY);
+    }
+
     public LobbiesPanel(MatchmakingPanel parent, Rectangle location){
         this.parent = parent;
 
@@ -35,6 +73,11 @@ public class LobbiesPanel extends JPanel {
         this.buildPanel();
         this.buildComponents();
         this.buildLayout();
+
+        this.buildListeners();
+
+        //this.requestFocusInWindow();
+        System.out.println("Lobbies Built...");
     }
 
     private void buildLayout(){
@@ -73,49 +116,15 @@ public class LobbiesPanel extends JPanel {
         this.createLobbyPushButton = new JButton("Create Lobby");
         this.joinLobbyPushButton = new JButton("Join Lobby");
 
-        this.createLobbyPushButton.addActionListener(e->this.createLobby());
-        System.out.println("wtf");
-
-        this.setVisible(true);
-        this.setEnabled(true);
-
-        this.addKeyListener(new KeyListener() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-
-            }
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-                System.out.println(e);
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-
-            }
-        });
+        //System.out.println("wtf");
 
         //EventHandler.addToMessageQueue("CRT_LBY");
 
-
-        EventHandler.addToMessageQueue("CRT_LBY");
+        //EventHandler.addToMessageQueue("CRT_LBY");
     }
 
-    private void createLobby(){
-        /*try {
-            synchronized (MainWindow.getLock()) {
-                MainWindow.getLock().wait(1000);
-                System.out.println("Button Pressed!!!!");
-                EventHandler.addToMessageQueue("CRT_LBY");
-                MainWindow.getLock().notifyAll();
-            }
-        }
-        catch (InterruptedException e){
-
-        }*/
-
-        System.out.println("PRESSED BUTTON FFS");
+    public JButton getCreateLobbyPushButton(){
+        return this.createLobbyPushButton;
     }
 
     private void buildPanel(){

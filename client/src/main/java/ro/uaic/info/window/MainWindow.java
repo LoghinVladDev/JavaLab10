@@ -1,17 +1,16 @@
 package ro.uaic.info.window;
 
 import ro.uaic.info.net.Connection;
-import ro.uaic.info.net.handler.EventHandler;
 import ro.uaic.info.net.state.ClientState;
 import ro.uaic.info.panel.MatchmakingPanel;
 import ro.uaic.info.window.state.ConnectionWindowStates;
 import ro.uaic.info.window.state.MessageWindowStates;
 import ro.uaic.info.window.type.MessageWindowType;
+import ro.uaic.info.net.handler.EventHandler;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.util.Queue;
 
 public class MainWindow extends JFrame {
@@ -36,13 +35,13 @@ public class MainWindow extends JFrame {
     private JLabel usernameLabel;
     private JLabel pingLabel;
 
-    //private static Object lock = new Object();
+    private static Object lock = new Object();
 
-   // public static Object getLock() {
-    //    return lock;
-    //}
+    public static Object getLock() {
+        return lock;
+    }
 
-    //private EventHandler messageHandler;
+    private EventHandler messageHandler;
 
     public MainWindow(){
     }
@@ -88,17 +87,24 @@ public class MainWindow extends JFrame {
 
         this.buildWindow();
         this.waitForConnection();
-        this.buildListeners();
 
         this.buildComponents();
         this.buildLayout();
 
         this.setVisible(true);
+
+        System.out.println("Window Built...");
+
+        this.buildListeners();
+
+        this.matchmakingPanel.setFocusable(true);
+        this.matchmakingPanel.grabFocus();
+        this.matchmakingPanel.getLobbiesPanel().grabFocus();
     }
 
     private void buildComponents(){
-        //this.messageHandler = new EventHandler(this);
-        //this.messageHandler.start();
+        this.messageHandler = new EventHandler(this);
+        this.messageHandler.start();
 
         this.connectionLabel    = new JLabel();
         this.pingLabel          = new JLabel();
@@ -184,6 +190,25 @@ public class MainWindow extends JFrame {
                     }
                 }
         );
+        this.addKeyListener(
+                new KeyListener() {
+                    @Override
+                    public void keyTyped(KeyEvent e) {
+
+                    }
+
+                    @Override
+                    public void keyPressed(KeyEvent e) {
+                        System.out.println(e.getKeyCode());
+                    }
+
+                    @Override
+                    public void keyReleased(KeyEvent e) {
+
+                    }
+                }
+        );
+
     }
 
     private void buildWindow(){
@@ -226,7 +251,7 @@ public class MainWindow extends JFrame {
         return this.windowWidth;
     }
 
-    //public EventHandler getMessageHandler(){
-    //    return this.messageHandler;
-    //}
+    public EventHandler getMessageHandler(){
+        return this.messageHandler;
+    }
 }

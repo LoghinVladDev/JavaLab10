@@ -1,6 +1,7 @@
 package ro.uaic.info.server;
 
 import ro.uaic.info.net.Connection;
+import ro.uaic.info.net.state.ClientState;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -24,23 +25,28 @@ public class ClientThread extends Thread {
     }
 
     public void run(){
-        if(this.debuggingEnabled)
-            this.printMessage("Reading...");
+        while(true){
+            String message = this.connection.readMessage();
+            ClientState clientState = this.decodeState(message);
 
-        String receivedMessage = this.connection.readMessage();
+            System.out.println(clientState);
 
-        if(this.debuggingEnabled)
-            this.printMessage("Read...");
+            if(clientState.equals(ClientState.CLIENT_EXIT) || !this.connection.isConnected() || clientState.equals(ClientState.UNKNOWN))
+                break;
 
-        if(this.debuggingEnabled)
-            this.printMessage("Writing...");
-
-        this.connection.writeMessage("Hello " + receivedMessage + "!");
-
-        if(this.debuggingEnabled)
-            this.printMessage("Wrote...");
+            this.connection.writeMessage("SER_ACK");
+        }
 
         this.connection.disconnect();
+    }
+
+    public ClientState decodeState(String message){
+        switch (message){
+            case "REG_UPD": return ClientState.STATUS_UPDATE;
+            case "CRT_LBY": return ClientState.CREATE_LOBBY;
+            case "CLI_STP": return ClientState.CLIENT_EXIT;
+            default :       return ClientState.UNKNOWN;
+        }
     }
 
     public void printMessage(String message){

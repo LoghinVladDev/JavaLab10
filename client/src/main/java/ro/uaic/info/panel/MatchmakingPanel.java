@@ -4,6 +4,7 @@ import ro.uaic.info.window.MainWindow;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 
 public class MatchmakingPanel extends JPanel {
     public static final int DEFAULT_COMPONENT_MARGIN = 10;
@@ -20,6 +21,26 @@ public class MatchmakingPanel extends JPanel {
         this.buildPanel();
         this.buildComponents();
         this.buildLayout();
+
+        this.buildListeners();
+
+        System.out.println("Matchmaking Built...");
+    }
+
+    public LobbiesPanel getLobbiesPanel() {
+        return this.lobbiesPanel;
+    }
+
+    public LobbyPanel getLobbyPanel() {
+        return this.lobbyPanel;
+    }
+
+    public LobbySettingsPanel getLobbySettingsPanel() {
+        return this.lobbySettingsPanel;
+    }
+
+    private void buildListeners(){
+
     }
 
     private void buildComponents(){
@@ -35,15 +56,6 @@ public class MatchmakingPanel extends JPanel {
                 )
         );
 
-        this.lobbiesPanel = new LobbiesPanel(
-                this,
-                new Rectangle(
-                        this.getX() + this.getWidth() / 3 + 2 * DEFAULT_COMPONENT_MARGIN,
-                        this.getY() + DEFAULT_COMPONENT_MARGIN,
-                        this.getWidth() / 3 * 2 - DEFAULT_COMPONENT_MARGIN,
-                        this.getHeight() - DEFAULT_COMPONENT_MARGIN
-                )
-        );
 
         this.lobbySettingsPanel = new LobbySettingsPanel(
                 this,
@@ -54,6 +66,20 @@ public class MatchmakingPanel extends JPanel {
                         this.getHeight() / 2 - DEFAULT_COMPONENT_MARGIN
                 )
         );
+
+        this.lobbiesPanel = new LobbiesPanel(
+                this,
+                new Rectangle(
+                        this.getX() + this.getWidth() / 3 + 2 * DEFAULT_COMPONENT_MARGIN,
+                        this.getY() + DEFAULT_COMPONENT_MARGIN,
+                        this.getWidth() / 3 * 2 - DEFAULT_COMPONENT_MARGIN,
+                        this.getHeight() - DEFAULT_COMPONENT_MARGIN
+                )
+        );
+
+        System.out.println("L " + this.lobbyPanel.getBounds());
+        System.out.println("LS " + this.lobbySettingsPanel.getBounds());
+        System.out.println("LOBBIES " + this.lobbiesPanel.getBounds());
     }
 
     private void buildLayout(){

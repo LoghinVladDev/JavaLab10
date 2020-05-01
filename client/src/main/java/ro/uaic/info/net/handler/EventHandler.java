@@ -2,6 +2,7 @@ package ro.uaic.info.net.handler;
 
 import com.mifmif.common.regex.Main;
 import ro.uaic.info.net.state.ClientState;
+import ro.uaic.info.net.state.ServerState;
 import ro.uaic.info.window.MainWindow;
 
 import java.util.LinkedList;
@@ -10,7 +11,7 @@ import java.util.Queue;
 public class EventHandler extends Thread {
     public static final int DEFAULT_TICK_RATE = 2;
 
-    private static Queue<String> messageQueue = new LinkedList<>();
+    private  Queue<String> messageQueue = new LinkedList<>();
     private int tickRate = DEFAULT_TICK_RATE;
 
     private int sleepTimer;
@@ -23,41 +24,51 @@ public class EventHandler extends Thread {
     }
 
     public synchronized void run(){
-        try {
-            Thread.sleep(5000);
-        }
-        catch (Exception e){
-
-        }
-/*
         while(true){
             try {
-                synchronized (MainWindow.getLock()) {
-                    MainWindow.getLock().wait(1000);
+                //synchronized (MainWindow.getLock()) {
+                    //MainWindow.getLock().wait(1000);
                     //System.out.println("tick");
-                    System.out.println(messageQueue);
+                    Thread.sleep(this.tickRate);
+                    //System.out.println(messageQueue);
 
-                    MainWindow.getLock().notifyAll();
+                    if(messageQueue.isEmpty()){
+                        this.addToMessageQueue(ClientState.STATUS_UPDATE);
+                    }
 
-                }
+                    this.parent.getConnection().writeMessage(messageQueue.remove());
+
+                    String message = this.parent.getConnection().readMessage();
+
+                    System.out.println(decodeServerState(message));
+
+                    //MainWindow.getLock().notifyAll();
+                    //}
             }
             catch (InterruptedException e){
 
             }
 
-        }*/
+        }
 
     }
 
-    public static void addToMessageQueue(ClientState state){
+    public void addToMessageQueue(ClientState state){
         switch(state){
-            case STATUS_UPDATE: addToMessageQueue("REG_UPD");
-                break;
-            case CREATE_LOBBY: addToMessageQueue("CRT_LBY");
+            case STATUS_UPDATE: addToMessageQueue("REG_UPD");   break;
+            case CREATE_LOBBY:  addToMessageQueue("CRT_LBY");   break;
+            case CLIENT_EXIT:   addToMessageQueue("CLI_STP");   break;
         }
     }
 
-    public static void addToMessageQueue(String message){
+    public ServerState decodeServerState(String message){
+        switch(message){
+            case "SER_ACK" : return ServerState.DO_NOTHING;
+            default: return ServerState.UNKNOWN;
+        }
+    }
+
+    public  void addToMessageQueue(String message){
         messageQueue.add(message);
     }
 }

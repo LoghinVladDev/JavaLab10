@@ -2,6 +2,10 @@ package ro.uaic.info.panel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 public class LobbySettingsPanel extends JPanel{
     private MatchmakingPanel parent;
@@ -20,6 +24,8 @@ public class LobbySettingsPanel extends JPanel{
         this.panelHeight    = location.height;
 
         this.buildPanel();
+
+        System.out.println("Lobby Settings Built...");
     }
 
     private void buildPanel(){
