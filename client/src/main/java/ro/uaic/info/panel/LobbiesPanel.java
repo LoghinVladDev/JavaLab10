@@ -4,6 +4,9 @@ import ro.uaic.info.net.handler.EventHandler;
 import ro.uaic.info.net.state.ClientState;
 import ro.uaic.info.resource.Lobby;
 import ro.uaic.info.window.MainWindow;
+import ro.uaic.info.window.MessageWindow;
+import ro.uaic.info.window.state.MessageWindowStates;
+import ro.uaic.info.window.type.MessageWindowType;
 
 import javax.swing.*;
 import java.awt.*;
@@ -33,36 +36,96 @@ public class LobbiesPanel extends JPanel {
     private void buildListeners(){
         this.createLobbyPushButton.addMouseListener(
                 new MouseListener() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-
-                    }
-
-                    @Override
-                    public void mousePressed(MouseEvent e) {
-
-                    }
-
-                    @Override
+                    public void mouseClicked(MouseEvent e) { }
+                    public void mousePressed(MouseEvent e) { }
                     public void mouseReleased(MouseEvent e) {
                         createLobby();
                     }
+                    public void mouseEntered(MouseEvent e) { }
+                    public void mouseExited(MouseEvent e) { }
+                }
+        );
 
-                    @Override
-                    public void mouseEntered(MouseEvent e) {
-
+        this.joinLobbyPushButton.addMouseListener(
+                new MouseListener() {
+                    public void mouseClicked(MouseEvent e) { }
+                    public void mousePressed(MouseEvent e) { }
+                    public void mouseReleased(MouseEvent e) {
+                        joinLobby();
                     }
+                    public void mouseEntered(MouseEvent e) { }
+                    public void mouseExited(MouseEvent e) { }
+                }
+        );
 
-                    @Override
-                    public void mouseExited(MouseEvent e) {
-
+        this.lobbiesList.addMouseListener(
+                new MouseListener() {
+                    public void mouseClicked(MouseEvent e) {
+                        JList list = (JList)e.getSource();
+                        if( e.getClickCount() >= 1 ){
+                            list.setSelectedIndex(list.locationToIndex(
+                                    new Point(
+                                            e.getPoint().x,
+                                            e.getPoint().y - 37
+                                    )
+                            ));
+                        }
                     }
+                    public void mousePressed(MouseEvent e) {
+                        JList list = (JList)e.getSource();
+                        if( e.getClickCount() >= 1 ){
+                            list.setSelectedIndex(list.locationToIndex(
+                                    new Point(
+                                            e.getPoint().x,
+                                            e.getPoint().y - 37
+                                    )
+                            ));
+                        }}
+                    public void mouseReleased(MouseEvent e) {
+                        JList list = (JList)e.getSource();
+                        if( e.getClickCount() >= 1 ){
+                            list.setSelectedIndex(list.locationToIndex(
+                                    new Point(
+                                            e.getPoint().x,
+                                            e.getPoint().y - 37
+                                    )
+                            ));
+                        }}
+
+                    public void mouseEntered(MouseEvent e) { }
+                    public void mouseExited(MouseEvent e) { }
                 }
         );
     }
 
+    private void joinLobby(){
+        String lobbyName = this.lobbiesList.getSelectedValue();
+
+        Lobby selectedLobby = null;
+
+        for(Lobby lobby : this.lobbyList){
+            if(lobby.getCreator().equals(lobbyName))
+                selectedLobby = lobby;
+        }
+
+        if(selectedLobby == null)
+            return;
+
+        if(selectedLobby.getCreator().equals(this.parent.getParent().getUsername())){
+            return;
+        }
+
+        //TODO: implement state and event for joining queue
+    }
+
     private void createLobby(){
         this.parent.getParent().getMessageHandler().addToMessageQueue(ClientState.CREATE_LOBBY);
+
+        this.createLobbyPanel();
+    }
+
+    private void createLobbyPanel(){
+        this.parent.getLobbyPanel().setLobby(new Lobby(this.parent.getParent().getUsername()));
     }
 
     public LobbiesPanel(MatchmakingPanel parent, Rectangle location){
@@ -126,16 +189,18 @@ public class LobbiesPanel extends JPanel {
         //this.lobbiesListModel.clear();
 
         List<Lobby> list = decodeJSONLobbies(JSONEncodedLobbies);
+        this.lobbyList = list;
 
         int index = 0;
         if(list != null)
-        for(Lobby lobby : list){
-            System.out.println(lobby);
-            if(!this.lobbyExists(lobby)){
-                this.lobbiesListModel.add(index++, lobby.getCreator());
-                System.out.println(lobby);
+            for(Lobby lobby : list){
+                //System.out.println(lobby);
+                if(!this.lobbyExists(lobby) && !lobby.getCreator().equals(this.parent.getParent().getUsername())){
+                    this.lobbiesListModel.add(index++, lobby.getCreator());
+                    //System.out.println(lobby);
+                }
             }
-        }
+
         for(int i = 0; i < this.lobbiesListModel.size(); i++)
             if(!list.contains(new Lobby(this.lobbiesListModel.get(i))))
                 this.lobbiesListModel.remove(i);

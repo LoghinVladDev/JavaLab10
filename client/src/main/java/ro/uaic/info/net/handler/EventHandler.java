@@ -9,7 +9,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class EventHandler extends Thread {
-    public static final int DEFAULT_TICK_RATE = 16;
+    public static final int DEFAULT_TICK_RATE = 1;
 
     private  Queue<String> messageQueue = new LinkedList<>();
     private int tickRate = DEFAULT_TICK_RATE;

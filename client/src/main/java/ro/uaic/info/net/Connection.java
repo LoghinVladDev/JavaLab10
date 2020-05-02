@@ -195,8 +195,8 @@ public class Connection {
         //char[] messageChar = message.toCharArray();
         //int length = messageChar.length;
 
-        if(this.debugActive)
-            System.out.println(" ... Writing message ... " + message);
+        //if(this.debugActive)
+            //System.out.println(" ... Writing message ... " + message);
 
         //output.println(message);
         //output.flush();
