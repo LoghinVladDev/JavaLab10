@@ -19,6 +19,7 @@ import java.util.List;
 
 public class LobbiesPanel extends JPanel {
     private MatchmakingPanel parent;
+    private String lobbyJoinee;
 
     private int offsetX;
     private int offsetY;
@@ -99,6 +100,7 @@ public class LobbiesPanel extends JPanel {
     }
 
     private void joinLobby(){
+
         String lobbyName = this.lobbiesList.getSelectedValue();
 
         Lobby selectedLobby = null;
@@ -115,13 +117,35 @@ public class LobbiesPanel extends JPanel {
             return;
         }
 
+        this.parent.getParent().getMessageHandler().addToMessageQueue(ClientState.JOIN_LOBBY);
+
+        this.lobbyJoinee = this.lobbiesList.getSelectedValue();
+
+        this.parent.getParent().getMessageHandler().addToMessageQueue(this.lobbyJoinee);
+
         //TODO: implement state and event for joining queue
     }
 
+    public void joinLobby(boolean success){
+        if(success) {
+            if(this.parent.getParent().isLobbyCreated())
+                this.parent.getParent().getMessageHandler().addToMessageQueue(ClientState.DELETE_LOBBY);
+            System.out.println("Joined " + this.lobbyJoinee + "'s lobby");
+            this.parent.getLobbyPanel().setLobbyCreator(this.lobbyJoinee).setLobbyOtherPlayer(this.parent.getParent().getUsername());
+        }
+        else
+            System.out.println("Failed to join lobby");
+    }
+
     private void createLobby(){
+        if(this.parent.getParent().isLobbyCreated())
+            return;
+
         this.parent.getParent().getMessageHandler().addToMessageQueue(ClientState.CREATE_LOBBY);
 
         this.createLobbyPanel();
+
+        this.parent.getParent().setLobbyCreated(true);
     }
 
     private void createLobbyPanel(){

@@ -115,6 +115,7 @@ public class MatchmakingPanel extends JPanel {
                 new JLabel().getHeight(),
                 this.parent.getWidth(),
                 this.parent.getHeight() - new JLabel().getHeight());
+
     }
 
     public MainWindow getParent() {

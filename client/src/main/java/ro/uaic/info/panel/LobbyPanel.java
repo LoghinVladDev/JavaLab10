@@ -104,6 +104,17 @@ public class LobbyPanel extends JPanel{
         System.out.println(this);
     }
 
+    public LobbyPanel setLobbyCreator(String creatorUsername){
+        this.lobbyTitle.setText(creatorUsername + "'s lobby");
+        this.creatorLabel.setText("White : " + creatorUsername);
+        return this;
+    }
+
+    public LobbyPanel setLobbyOtherPlayer(String otherPlayerUsername){
+        this.opponentLabel.setText("Black : " + otherPlayerUsername);
+        return this;
+    }
+
     private void buildPanel(){
         super.setBounds(
                 this.offsetX,

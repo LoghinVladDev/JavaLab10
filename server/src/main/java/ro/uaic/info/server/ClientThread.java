@@ -32,29 +32,59 @@ public class ClientThread extends Thread {
         this.matchmakingResources = matchmakingResources;
     }
 
-    public void treatState(ClientState state){
-        if(state.equals(ClientState.CLIENT_START)){
-            this.connection.writeMessage("GET_USR");
-            this.username = this.connection.readMessage();
+    public void clientInitialisation(){
+        this.connection.writeMessage("GET_USR");
+        this.username = this.connection.readMessage();
+
+        if(this.debuggingEnabled)
             System.out.println("Received Username ... " + this.username);
-            this.connection.writeMessage("SER_ACK");
-            return;
+
+        this.connection.writeMessage("SER_ACK");
+    }
+
+    public void createLobby(){
+        this.matchmakingResources
+                .addLobby(
+                        new Lobby(this.username)
+                );
+
+        System.out.println("New Lobby List : " + this.matchmakingResources.getLobbyList());
+        this.connection.writeMessage("SER_ACK");
+    }
+
+    public void lobbyTickUpdate(){
+        this.connection.writeMessage("SND_MAT_LST");
+        this.connection.writeMessage(this.matchmakingResources.getLobbyList().toString());
+    }
+
+    public void deleteLobby(String creatorUsername){
+        this.matchmakingResources.removeLobby(creatorUsername);
+        this.connection.writeMessage("SER_ACK");
+    }
+
+    public void joinLobby(){
+        this.connection.writeMessage("GET_LBY");
+        String creatorUsername = this.connection.readMessage();
+
+        System.out.println("\t... " + this.username + " wants to join " + creatorUsername + "'s lobby ...");
+
+        int status = this.matchmakingResources.addToLobby(creatorUsername, username);
+
+        switch (status){
+            case 0 : this.connection.writeMessage("JIN_LBY_SUC"); return;
+            case -1: this.connection.writeMessage("JIN_LBY_INV"); return;
+            case 1 : this.connection.writeMessage("JIN_LBY_FUL"); return;
         }
 
-        if(state.equals(ClientState.CREATE_LOBBY)){
-            this.matchmakingResources
-                    .addLobby(
-                            new Lobby(this.username)
-                    );
+    }
 
-            System.out.println("New Lobby List : " + this.matchmakingResources.getLobbyList());
-            this.connection.writeMessage("SER_ACK");
-            return;
-        }
-
-        if(state.equals(ClientState.STATUS_UPDATE)){
-            this.connection.writeMessage("SND_MAT_LST");
-            this.connection.writeMessage(this.matchmakingResources.getLobbyList().toString());
+    public void treatState(ClientState state){
+        switch (state){
+            case CREATE_LOBBY:  this.createLobby();                 return;
+            case CLIENT_START:  this.clientInitialisation();        return;
+            case STATUS_UPDATE: this.lobbyTickUpdate();             return;
+            case DELETE_LOBBY:  this.deleteLobby(this.username);    return;
+            case JOIN_LOBBY:    this.joinLobby();
         }
     }
 
@@ -98,6 +128,8 @@ public class ClientThread extends Thread {
             case "CRT_LBY": return ClientState.CREATE_LOBBY;
             case "CLI_STP": return ClientState.CLIENT_EXIT;
             case "CLI_STA": return ClientState.CLIENT_START;
+            case "CLI_JON": return ClientState.JOIN_LOBBY;
+            case "CLI_DEL": return ClientState.DELETE_LOBBY;
             default :       return ClientState.UNKNOWN;
         }
     }

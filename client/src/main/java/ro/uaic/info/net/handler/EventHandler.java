@@ -85,6 +85,17 @@ public class EventHandler extends Thread {
             String lobbyListString = this.parent.getConnection().readMessage();
             System.out.println(lobbyListString);
             this.parent.getMatchmakingPanel().getLobbiesPanel().updateLobbies(lobbyListString);
+            return;
+        }
+
+        if(state.equals(ServerState.JOIN_LOBBY_SUCCESS)) {
+            this.parent.getMatchmakingPanel().getLobbiesPanel().joinLobby(true);
+            return;
+        }
+
+        if(state.equals(ServerState.JOIN_LOBBY_FAIL_NO_LOBBY) || state.equals(ServerState.JOIN_LOBBY_FAIL_LOBBY_FULL)){
+            this.parent.getMatchmakingPanel().getLobbiesPanel().joinLobby(false);
+            return;
         }
     }
 
@@ -95,18 +106,24 @@ public class EventHandler extends Thread {
 
     public void addToMessageQueue(ClientState state){
         switch(state){
-            case STATUS_UPDATE: addToMessageQueue("REG_UPD");   break;
-            case CREATE_LOBBY:  addToMessageQueue("CRT_LBY");   break;
-            case CLIENT_EXIT:   addToMessageQueue("CLI_STP");   break;
-            case CLIENT_START:  addToMessageQueue("CLI_STA");   break;
+            case STATUS_UPDATE: this.addToMessageQueue("REG_UPD");   break;
+            case CREATE_LOBBY:  this.addToMessageQueue("CRT_LBY");   break;
+            case CLIENT_EXIT:   this.addToMessageQueue("CLI_STP");   break;
+            case CLIENT_START:  this.addToMessageQueue("CLI_STA");   break;
+            case JOIN_LOBBY:    this.addToMessageQueue("CLI_JON");   break;
+            case DELETE_LOBBY:  this.addToMessageQueue("CLI_DEL");   break;
         }
     }
 
     public ServerState decodeServerState(String message){
         switch(message){
+            case "GET_LBY" : return ServerState.WAITING_FOR_LOBBY_NAME;
             case "SER_ACK" : return ServerState.DO_NOTHING;
             case "GET_USR" : return ServerState.WAITING_FOR_USERNAME;
             case "SND_MAT_LST" : return ServerState.SENDING_MATCH_LIST;
+            case "JIN_LBY_SUC" : return ServerState.JOIN_LOBBY_SUCCESS;
+            case "JIN_LBY_INV" : return ServerState.JOIN_LOBBY_FAIL_NO_LOBBY;
+            case "JIN_LBY_FUL" : return ServerState.JOIN_LOBBY_FAIL_LOBBY_FULL;
             default: return ServerState.UNKNOWN;
         }
     }

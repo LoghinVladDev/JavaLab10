@@ -1,5 +1,6 @@
 package ro.uaic.info.window;
 
+import com.mifmif.common.regex.Main;
 import ro.uaic.info.net.Connection;
 import ro.uaic.info.net.state.ClientState;
 import ro.uaic.info.panel.MatchmakingPanel;
@@ -35,6 +36,8 @@ public class MainWindow extends JFrame {
     private JLabel usernameLabel;
     private JLabel pingLabel;
 
+    private boolean lobbyCreated = false;
+
     private static Object lock = new Object();
 
     public static Object getLock() {
@@ -43,7 +46,17 @@ public class MainWindow extends JFrame {
 
     private EventHandler messageHandler;
 
+    public MainWindow setLobbyCreated(boolean status){
+        this.lobbyCreated = status;
+        return this;
+    }
+
+    public boolean isLobbyCreated() {
+        return lobbyCreated;
+    }
+
     public MainWindow(){
+
     }
 
     public void setConnectionStatus(String status){
