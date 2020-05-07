@@ -117,10 +117,9 @@ public class LobbiesPanel extends JPanel {
             return;
         }
 
-        this.parent.getParent().getMessageHandler().addToMessageQueue(ClientState.JOIN_LOBBY);
-
         this.lobbyJoinee = this.lobbiesList.getSelectedValue();
 
+        this.parent.getParent().getMessageHandler().addToMessageQueue(ClientState.JOIN_LOBBY);
         this.parent.getParent().getMessageHandler().addToMessageQueue(this.lobbyJoinee);
 
         //TODO: implement state and event for joining queue
@@ -131,7 +130,9 @@ public class LobbiesPanel extends JPanel {
             if(this.parent.getParent().isLobbyCreated())
                 this.parent.getParent().getMessageHandler().addToMessageQueue(ClientState.DELETE_LOBBY);
             System.out.println("Joined " + this.lobbyJoinee + "'s lobby");
-            this.parent.getLobbyPanel().setLobbyCreator(this.lobbyJoinee).setLobbyOtherPlayer(this.parent.getParent().getUsername());
+            this.parent.getLobbyPanel().setLobby(new Lobby(this.lobbyJoinee).setOtherPlayer(this.parent.getParent().getUsername()));
+            this.parent.getLobbyPanel().getStartGameButton().setEnabled(false);
+            this.parent.getParent().setLobbyCreated(false);
         }
         else
             System.out.println("Failed to join lobby");
@@ -140,6 +141,16 @@ public class LobbiesPanel extends JPanel {
     private void createLobby(){
         if(this.parent.getParent().isLobbyCreated())
             return;
+
+        if(this.parent.getParent().getMatchmakingPanel().getLobbyPanel().getLobby() != null)
+            return;
+
+        //@deprecated
+        /*if(this.parent.getParent().getMatchmakingPanel().getLobbyPanel().getLobby() != null){
+            if(this.parent.getParent().getMatchmakingPanel().getLobbyPanel().getLobby().getCreator() != null)
+                if(!this.parent.getParent().getMatchmakingPanel().getLobbyPanel().getLobby().getCreator().equals(this.parent.getParent().getUsername()))
+                    this.parent.getParent().getMatchmakingPanel().getLobbyPanel().leaveLobby(this.parent.getParent().getMatchmakingPanel().getLobbyPanel().getLobby().getCreator());
+        }*/
 
         this.parent.getParent().getMessageHandler().addToMessageQueue(ClientState.CREATE_LOBBY);
 
@@ -222,6 +233,21 @@ public class LobbiesPanel extends JPanel {
                 if(!this.lobbyExists(lobby) && !lobby.getCreator().equals(this.parent.getParent().getUsername())){
                     this.lobbiesListModel.add(index++, lobby.getCreator());
                     //System.out.println(lobby);
+                }
+
+                if(
+                        this.lobbyExists(lobby) &&
+                        this.parent.getLobbyPanel().getLobby() != null &&
+                        this.parent.getLobbyPanel().getLobby().getCreator().equals(this.parent.getParent().getUsername()) && (
+                                this.parent.getLobbyPanel().getLobby().getOtherPlayer() == null &&
+                                lobby.getOtherPlayer() != null ||
+                                this.parent.getLobbyPanel().getLobby().getOtherPlayer() != null &&
+                                lobby.getOtherPlayer() == null
+                        )
+                ){
+                    // TODO : doesn't work, why?
+
+                    this.parent.getLobbyPanel().getLobby().setOtherPlayer(lobby.getOtherPlayer());
                 }
             }
 

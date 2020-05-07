@@ -97,6 +97,15 @@ public class EventHandler extends Thread {
             this.parent.getMatchmakingPanel().getLobbiesPanel().joinLobby(false);
             return;
         }
+
+        if(state.equals(ServerState.LEAVE_LOBBY_SUCCESS)){
+            this.parent.getMatchmakingPanel().getLobbyPanel().leaveLobby();
+        }
+
+        if(state.equals(ServerState.GAME_START_SUCCESS)){
+            this.parent.getMatchmakingPanel().setEnabled(false);
+            this.parent.getMatchmakingPanel().setVisible(false);
+        }
     }
 
     public synchronized void treatServerFail(){
@@ -112,6 +121,8 @@ public class EventHandler extends Thread {
             case CLIENT_START:  this.addToMessageQueue("CLI_STA");   break;
             case JOIN_LOBBY:    this.addToMessageQueue("CLI_JON");   break;
             case DELETE_LOBBY:  this.addToMessageQueue("CLI_DEL");   break;
+            case START_GAME:    this.addToMessageQueue("STA_GAM");   break;
+            case LEAVE_LOBBY :  this.addToMessageQueue("CLI_LEV");
         }
     }
 
@@ -124,6 +135,9 @@ public class EventHandler extends Thread {
             case "JIN_LBY_SUC" : return ServerState.JOIN_LOBBY_SUCCESS;
             case "JIN_LBY_INV" : return ServerState.JOIN_LOBBY_FAIL_NO_LOBBY;
             case "JIN_LBY_FUL" : return ServerState.JOIN_LOBBY_FAIL_LOBBY_FULL;
+            case "LEV_LBY_SUC" : return ServerState.LEAVE_LOBBY_SUCCESS;
+            case "GAM_STA_FAI" : return ServerState.GAME_START_FAILED;
+            case "GAM_STA_SUC" : return ServerState.GAME_START_SUCCESS;
             default: return ServerState.UNKNOWN;
         }
     }

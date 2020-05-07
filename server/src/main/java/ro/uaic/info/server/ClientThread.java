@@ -4,6 +4,7 @@ import ro.uaic.info.net.Connection;
 import ro.uaic.info.net.state.ClientState;
 import ro.uaic.info.resource.Lobby;
 import ro.uaic.info.resource.MatchmakingResources;
+import ro.uaic.info.resource.ServerResources;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,10 +19,21 @@ public class ClientThread extends Thread {
     private final int threadID;
     private final boolean debuggingEnabled = true;
     private String username;
+    private String opponent;
+    private ClientThread opponentThread;
 
     private MatchmakingResources matchmakingResources;
+    private ServerResources      serverResources;
 
-    public ClientThread(Socket socket, int threadID, MatchmakingResources matchmakingResources){
+    public int getThreadID() {
+        return this.threadID;
+    }
+
+    public String getUsername() {
+        return this.username;
+    }
+
+    public ClientThread(Socket socket, int threadID, MatchmakingResources matchmakingResources, ServerResources serverResources){
         this.socket = socket;
         this.connection = new Connection.ConnectionFactory()
                 .withSocket(this.socket)
@@ -30,6 +42,7 @@ public class ClientThread extends Thread {
         this.connection.initializeBuffers();
         this.threadID = threadID;
         this.matchmakingResources = matchmakingResources;
+        this.serverResources = serverResources;
     }
 
     public void clientInitialisation(){
@@ -78,13 +91,55 @@ public class ClientThread extends Thread {
 
     }
 
+    public void leaveLobby(){
+        this.connection.writeMessage("GET_LBY");
+        String creatorUsername = this.connection.readMessage();
+
+        this.matchmakingResources.leaveLobby(username);
+
+        System.out.println("\t... " + this.username + " wants to leave " + creatorUsername + "'s lobby ...");
+
+        this.connection.writeMessage("LEV_LBY_SUC");
+    }
+
+    public void startGame(){
+
+        for(Lobby lobby : this.matchmakingResources.getLobbyList()){
+            if(lobby.getOtherPlayer() == null){
+                this.connection.writeMessage("GAM_STA_FAI");
+            }
+
+            if(lobby.getCreator().equals(this.username)){
+                for(ClientThread thread : this.serverResources.getThreadList()){
+                    if(lobby.getOtherPlayer().equals(thread.username)){
+                        this.connection.writeMessage("GAM_STA_SUC");
+                        this.opponent = thread.username;
+                        thread.signalToStartGame(this, this.username);
+
+                        System.out.println(this.username + " wants to start a game agains " + this.opponent);
+                    }
+                }
+            }
+        }
+    }
+
+    public void signalToStartGame(ClientThread opponentThread, String opponent){
+        System.out.println(this.username + " will be placed in a game against " + opponent);
+
+        this.connection.writeMessage("GAM_STA_SUC");
+        this.opponent = opponent;
+        this.opponentThread = opponentThread;
+    }
+
     public void treatState(ClientState state){
         switch (state){
             case CREATE_LOBBY:  this.createLobby();                 return;
             case CLIENT_START:  this.clientInitialisation();        return;
             case STATUS_UPDATE: this.lobbyTickUpdate();             return;
             case DELETE_LOBBY:  this.deleteLobby(this.username);    return;
-            case JOIN_LOBBY:    this.joinLobby();
+            case LEAVE_LOBBY:   this.leaveLobby();                  return;
+            case JOIN_LOBBY:    this.joinLobby();                   return;
+            case START_GAME:    this.startGame();
         }
     }
 
@@ -130,6 +185,8 @@ public class ClientThread extends Thread {
             case "CLI_STA": return ClientState.CLIENT_START;
             case "CLI_JON": return ClientState.JOIN_LOBBY;
             case "CLI_DEL": return ClientState.DELETE_LOBBY;
+            case "CLI_LEV": return ClientState.LEAVE_LOBBY;
+            case "STA_GAM": return ClientState.START_GAME;
             default :       return ClientState.UNKNOWN;
         }
     }

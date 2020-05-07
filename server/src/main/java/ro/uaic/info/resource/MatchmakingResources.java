@@ -19,6 +19,17 @@ public class MatchmakingResources {
         this.lobbyList.removeIf(lobby -> lobby.getCreator().equals(creator));
     }
 
+    public void leaveLobby(String username){
+        for(Lobby lobby : this.lobbyList){
+            if(lobby.getOtherPlayer() != null)
+                if(lobby.getOtherPlayer().equals(username)) {
+                    lobby.setOtherPlayer(null);
+                    return;
+                }
+        }
+        this.removeLobby(username);
+    }
+
     public int addToLobby(String creatorUsername, String username){
         for(Lobby lobby : this.lobbyList)
             if(lobby.getCreator().equals(creatorUsername))

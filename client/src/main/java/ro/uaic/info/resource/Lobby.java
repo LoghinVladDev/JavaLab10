@@ -16,6 +16,11 @@ public class Lobby {
         return this;
     }
 
+    public Lobby setCreator(String creator){
+        this.creator = creator;
+        return this;
+    }
+
     public String toString(){
         return
                 "{Lobby:creator=" +

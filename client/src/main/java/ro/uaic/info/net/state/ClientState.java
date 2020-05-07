@@ -6,5 +6,7 @@ public enum ClientState {
     CREATE_LOBBY,
     JOIN_LOBBY,
     DELETE_LOBBY,
-    CLIENT_EXIT
+    CLIENT_EXIT,
+    LEAVE_LOBBY,
+    START_GAME
 }

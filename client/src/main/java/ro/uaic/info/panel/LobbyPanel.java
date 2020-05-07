@@ -1,5 +1,6 @@
 package ro.uaic.info.panel;
 
+import ro.uaic.info.net.state.ClientState;
 import ro.uaic.info.resource.Lobby;
 
 import javax.swing.*;
@@ -25,7 +26,68 @@ public class LobbyPanel extends JPanel{
     private JButton leaveLobbyButton;
     private JButton startGameButton;
 
+    private Lobby lobby;
+
     private boolean isShown = false;
+
+    public Lobby getLobby(){
+        return this.lobby;
+    }
+
+    public void buildListeners(){
+        if(!isShown){
+            this.leaveLobbyButton.addMouseListener(
+                new MouseListener() {
+                    public void mouseClicked(MouseEvent e) { }
+                    public void mousePressed(MouseEvent e) { }
+                    public void mouseReleased(MouseEvent e) {
+                        leaveLobby(lobby.getCreator());
+                    }
+                    public void mouseEntered(MouseEvent e) { }
+                    public void mouseExited(MouseEvent e) { }
+                }
+            );
+
+            this.startGameButton.addMouseListener(
+                new MouseListener() {
+                    public void mouseClicked(MouseEvent e) { }
+                    public void mousePressed(MouseEvent e) { }
+                    public void mouseReleased(MouseEvent e) {
+                        sendStartGame();
+                    }
+                    public void mouseEntered(MouseEvent e) { }
+                    public void mouseExited(MouseEvent e) { }
+                }
+            );
+        }
+    }
+
+    private void sendStartGame(){
+        if(this.getLobby().getOtherPlayer() == null)
+            return;
+
+        this.parent.getParent().getMessageHandler().addToMessageQueue(ClientState.START_GAME);
+    }
+
+    public void leaveLobby(String lobbyCreator){
+        if(this.lobby.getOtherPlayer() != null)
+            if(!this.lobby.getOtherPlayer().equals(this.parent.getParent().getUsername()))
+                return;
+
+        this.parent.getParent().getMessageHandler().addToMessageQueue(ClientState.LEAVE_LOBBY);
+        this.parent.getParent().getMessageHandler().addToMessageQueue(lobbyCreator);
+        this.parent.getParent().setLobbyCreated(false);
+    }
+
+    public void leaveLobby(){
+        this.lobbyTitle.setText("");
+        this.creatorLabel.setText("");
+        this.opponentLabel.setText("");
+        this.lobby.setOtherPlayer(null);
+        this.lobby.setCreator(null);
+        this.leaveLobbyButton.setEnabled(false);
+        this.startGameButton.setEnabled(false);
+    }
 
     public LobbyPanel(MatchmakingPanel parent, Rectangle location){
         this.parent = parent;
@@ -92,10 +154,20 @@ public class LobbyPanel extends JPanel{
         }
     }
 
+    public JButton getStartGameButton(){
+        return this.startGameButton;
+    }
+
     public void setLobby(Lobby lobby){
         this.buildComponents();
         this.buildLayout();
+        this.buildListeners();
         this.isShown = true;
+
+        this.lobby = lobby;
+
+        this.leaveLobbyButton.setEnabled(true);
+        this.startGameButton.setEnabled(true);
 
         this.lobbyTitle.setText(lobby.getCreator() + "'s lobby");
         this.creatorLabel.setText("White : " + lobby.getCreator());
