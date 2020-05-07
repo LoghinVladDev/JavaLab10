@@ -101,7 +101,7 @@ public class MainWindow extends JFrame {
     }
 
     public void setPing(int ping){
-        this.ping = Integer.toString(ping) + " ms ping";
+        this.ping = ping + " ms ping";
         this.pingLabel.setText(this.ping);
     }
 
@@ -144,6 +144,22 @@ public class MainWindow extends JFrame {
         this.matchmakingPanel.getLobbiesPanel().grabFocus();
     }
 
+    public void debugRun(){
+        this.buildWindow();
+        ///this.connectionLabel    = new JLabel();
+        //this.pingLabel          = new JLabel();
+        //this.usernameLabel      = new JLabel();
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setVisible(true);
+        this.gamePanel = new GamePanel(this);
+        this.setContentPane(this.gamePanel);
+        this.gamePanel.getGameBoardPanel().grabFocus();
+        //this.buildLayout(true);
+        //this.gamePanel.getGameBoardPanel().initialiseCanvas();
+        //this.gamePanel.getGameBoardPanel().grabFocus();
+        //this.repaint();
+    }
+
     public String getUsername(){
         return this.username;
     }
@@ -156,16 +172,19 @@ public class MainWindow extends JFrame {
         this.pingLabel          = new JLabel();
         this.usernameLabel      = new JLabel();
 
+        this.connectionLabel.setText(this.updateConnectionStatus());
+        this.usernameLabel.setText(this.username);
+        this.pingLabel.setText(this.ping);
+
         this.matchmakingPanel   = new MatchmakingPanel(this); // TODO: add here
     }
 
     private void buildLayout(boolean redrawForGame){
+        if(redrawForGame)
+            this.setContentPane(new JPanel());
+
         GroupLayout groupLayout = new GroupLayout(this.getContentPane());
         this.getContentPane().setLayout(groupLayout);
-
-        this.connectionLabel.setText(this.updateConnectionStatus());
-        this.usernameLabel.setText(this.username);
-        this.pingLabel.setText(this.ping);
 
         groupLayout.setHorizontalGroup(
             groupLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
