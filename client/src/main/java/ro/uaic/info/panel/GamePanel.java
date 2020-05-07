@@ -88,7 +88,6 @@ public class GamePanel extends JPanel {
                 int finalJ = j;
                 int finalI = i;
                 this.addMouseListener(new MouseListener() {
-                    @Override
                     public void mouseClicked(MouseEvent e) { }
                     public void mousePressed(MouseEvent e) { }
                     public void mouseReleased(MouseEvent e) {

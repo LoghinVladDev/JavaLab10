@@ -57,11 +57,19 @@ public class MainWindow extends JFrame {
     }
 
     public boolean isLobbyCreated() {
-        return lobbyCreated;
+        return this.lobbyCreated;
     }
 
     public MainWindow(){
 
+    }
+
+    public Player getPlayer() {
+        return this.player;
+    }
+
+    public GamePanel getGamePanel() {
+        return gamePanel;
     }
 
     public void gameStartCallback(String colour){
@@ -72,6 +80,8 @@ public class MainWindow extends JFrame {
         );
 
         this.gamePanel = new GamePanel(this);
+        this.gamePanel.getGameBoardPanel().setTokenColour(colour);
+        this.gamePanel.getGameBoardPanel().setTurn(colour.equals("WHITE"));
 
         this.buildLayout(true);
     }

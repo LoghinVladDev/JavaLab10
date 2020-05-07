@@ -8,5 +8,7 @@ public enum ClientState {
     DELETE_LOBBY,
     CLIENT_EXIT,
     LEAVE_LOBBY,
+    REQUEST_BOARD,
+    PUT_PIECE,
     START_GAME
 }

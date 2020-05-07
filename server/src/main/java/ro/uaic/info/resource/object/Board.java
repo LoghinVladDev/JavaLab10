@@ -18,4 +18,31 @@ public class Board {
     public int getPieceOn(int x, int y){
         return this.board[y][x];
     }
+
+    public void putPiece(int x, int y, int player){
+        this.board[y][x] = player;
+    }
+
+    public String toString(){
+        StringBuilder sb = new StringBuilder();
+
+        sb
+                .append("{")
+                .append(this.board == null ? 0 : this.board.length)
+                .append(",")
+                .append(this.board == null ? 0 : (this.board[0] == null ? 0 : this.board[0].length))
+                .append(",[");
+        for(int i = 0, height = this.board == null ? 0 : this.board.length; i < height; i++){
+            sb.append('[');
+            for(int j = 0, width = this.board[i] == null ? 0 : this.board[i].length; j < width; j++){
+                sb.append(this.board[i][j]);
+                if(j < width - 1)
+                    sb.append(",");
+            }
+            sb.append("]");
+            if(i < height - 1)
+                sb.append(",");
+        }
+        return sb.append("]}").toString();
+    }
 }

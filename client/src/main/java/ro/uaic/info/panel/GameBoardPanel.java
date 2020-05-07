@@ -1,6 +1,7 @@
 package ro.uaic.info.panel;
 
 import ro.uaic.info.game.Board;
+import ro.uaic.info.net.state.ClientState;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,6 +15,25 @@ public class GameBoardPanel extends JPanel {
 
     public static final int DEFAULT_BOARD_WIDTH = 15;
     public static final int DEFAULT_BOARD_HEIGHT = 15;
+
+    private String tokenColour;
+    private boolean turn;
+
+    public String getTokenColour() {
+        return tokenColour;
+    }
+
+    public void setTokenColour(String tokenColour) {
+        this.tokenColour = tokenColour;
+    }
+
+    public boolean isTurn() {
+        return turn;
+    }
+
+    public void setTurn(boolean turn) {
+        this.turn = turn;
+    }
 
     private int horizontalOffset;
     private int squareSize;
@@ -181,6 +201,20 @@ public class GameBoardPanel extends JPanel {
 
     public void drawToken(int x, int y){
         System.out.println(x  + ", " + y);
+
+        if(this.isTurn()){
+            Point circleMiddle = new Point(
+                this.horizontalOffset + this.squareSize * x + this.squareSize/2,
+                this.offsetY/2 + this.squareSize * y + this.squareSize/2
+            );
+
+            this.parent.getParent().getMessageHandler().addToMessageQueue(ClientState.PUT_PIECE);
+            this.parent.getParent().getMessageHandler().addToMessageQueue("{" + x + "," + y + "}");
+        }
+    }
+
+    public void getJSONEncodedMatrix(String matrixJSON){
+        System.out.println("...map changed... " + matrixJSON);
     }
 
     private void buildLayout(){

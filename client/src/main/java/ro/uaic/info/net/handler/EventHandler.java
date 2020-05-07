@@ -118,6 +118,29 @@ public class EventHandler extends Thread {
             this.parent.gameStartCallback("BLACK");
             return;
         }
+
+        if(state.equals(ServerState.BLACK_PLAYER_TURN)){
+            if(this.parent.getGamePanel().getGameBoardPanel().getTokenColour().equals("BLACK") && !this.parent.getGamePanel().getGameBoardPanel().isTurn()){
+                this.parent.getConnection().writeMessage("REQ_BRD");
+                this.parent.getGamePanel().getGameBoardPanel().getJSONEncodedMatrix(this.parent.getConnection().readMessage());
+            }
+
+            this.parent.getGamePanel().getGameBoardPanel().setTurn(
+                    this.parent.getGamePanel().getGameBoardPanel().getTokenColour().equals("BLACK")
+            );
+            return;
+        }
+        if(state.equals(ServerState.WHITE_PLAYER_TURN)){
+            if(this.parent.getGamePanel().getGameBoardPanel().getTokenColour().equals("WHITE") && !this.parent.getGamePanel().getGameBoardPanel().isTurn()){
+                this.parent.getConnection().writeMessage("REQ_BRD");
+                this.parent.getGamePanel().getGameBoardPanel().getJSONEncodedMatrix(this.parent.getConnection().readMessage());
+            }
+
+            this.parent.getGamePanel().getGameBoardPanel().setTurn(
+                    this.parent.getGamePanel().getGameBoardPanel().getTokenColour().equals("WHITE")
+            );
+            return;
+        }
     }
 
     public synchronized void treatServerFail(){
@@ -134,6 +157,8 @@ public class EventHandler extends Thread {
             case JOIN_LOBBY:    this.addToMessageQueue("CLI_JON");   break;
             case DELETE_LOBBY:  this.addToMessageQueue("CLI_DEL");   break;
             case START_GAME:    this.addToMessageQueue("STA_GAM");   break;
+            case REQUEST_BOARD: this.addToMessageQueue("REQ_BRD");   break;
+            case PUT_PIECE:     this.addToMessageQueue("PUT_PIE");   break;
             case LEAVE_LOBBY :  this.addToMessageQueue("CLI_LEV");
         }
     }
@@ -153,6 +178,7 @@ public class EventHandler extends Thread {
             case "GAM_STA_SUC_BLA" : return ServerState.GAME_START_SUCCESS_BLACK;
             case "WHITE_TURN"  : return ServerState.WHITE_PLAYER_TURN;
             case "BLACK_TURN"  : return ServerState.BLACK_PLAYER_TURN;
+            case "GET_PIE"     : return ServerState.WAITING_FOR_PIECE_LOCATION;
             default: return ServerState.UNKNOWN;
         }
     }

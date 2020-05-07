@@ -216,6 +216,7 @@ public class ClientThread extends Thread {
             case "CLI_DEL": return ClientState.DELETE_LOBBY;
             case "CLI_LEV": return ClientState.LEAVE_LOBBY;
             case "STA_GAM": return ClientState.START_GAME;
+            case "REQ_BRD": return ClientState.REQUEST_BOARD;
             default :       return ClientState.UNKNOWN;
         }
     }

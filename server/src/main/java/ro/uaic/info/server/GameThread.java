@@ -82,9 +82,30 @@ public class GameThread {
                         (this.opponentThread.getGameThread().colour.toUpperCase() + "_TURN"));
     }
 
+    public void sendBoard(){
+        this.currentThread.getConnection().writeMessage(this.board.toString());
+    }
+
+    public void putPiece(){
+        this.currentThread.getConnection().writeMessage("GET_PIE");
+        String pieceLocation = this.currentThread.getConnection().readMessage();
+
+        int x = Integer.parseInt(pieceLocation.split(",")[0].replace("{", ""));
+        int y = Integer.parseInt(pieceLocation.split(",")[1].replace("}",""));
+
+        this.board.putPiece(x, y, this.colour.equals("WHITE") ? Board.WHITE : Board.BLACK);
+
+        this.opponentThread.getGameThread().setTurnActive(this.turnActive);
+        this.turnActive = !this.turnActive;
+
+        this.currentThread.getConnection().writeMessage("SER_ACK");
+    }
+
     public void treatState(ClientState state){
         switch (state){
             case STATUS_UPDATE:     this.sendTurnStatus();          return;
+            case REQUEST_BOARD:     this.sendBoard();               return;
+            case PUT_PIECE:         this.putPiece();                 return;
             case CLIENT_EXIT:       this.gameActive = false;
         }
     }
@@ -104,6 +125,8 @@ public class GameThread {
         switch (message){
             case "REG_UPD" : return ClientState.STATUS_UPDATE;
             case "CLI_STP" : return ClientState.CLIENT_EXIT;
+            case "PUT_PIE" : return ClientState.PUT_PIECE;
+            case "REQ_BRD" : return ClientState.REQUEST_BOARD;
             default        : return ClientState.UNKNOWN;
         }
     }

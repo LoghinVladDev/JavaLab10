@@ -128,7 +128,10 @@ public class LobbyPanel extends JPanel{
 
             layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                    .addComponent(this.lobbyTitle)
+                    .addGroup(
+                        layout.createSequentialGroup()
+                            .addComponent(this.lobbyTitle, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    )
                     .addGroup(
                         layout.createSequentialGroup()
                             .addComponent(this.creatorLabel, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -143,7 +146,10 @@ public class LobbyPanel extends JPanel{
 
             layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                    .addComponent(this.lobbyTitle)
+                    .addGroup(
+                        layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                            .addComponent(this.lobbyTitle)
+                    )
                     .addGroup(
                         layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                             .addComponent(this.creatorLabel)
