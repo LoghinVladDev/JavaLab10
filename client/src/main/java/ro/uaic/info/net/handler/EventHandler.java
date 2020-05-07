@@ -1,6 +1,7 @@
 package ro.uaic.info.net.handler;
 
 import com.mifmif.common.regex.Main;
+import ro.uaic.info.game.Player;
 import ro.uaic.info.net.state.ClientState;
 import ro.uaic.info.net.state.ServerState;
 import ro.uaic.info.window.MainWindow;
@@ -17,6 +18,8 @@ public class EventHandler extends Thread {
     private int sleepTimer;
 
     private MainWindow parent;
+
+    private boolean enableStop = false;
 
     public EventHandler(MainWindow parent){
         this.parent = parent;
@@ -43,10 +46,13 @@ public class EventHandler extends Thread {
                 System.out.println(messageQueue);
 
                 if (this.messageQueue.peek().equals("CLI_STP"))
-                    break;
+                    this.enableStop = true;
 
                 pingNano = System.nanoTime();
                 this.parent.getConnection().writeMessage(messageQueue.remove());
+
+                if(this.enableStop)
+                    break;
 
                 String message = this.parent.getConnection().readMessage();
                 pingNano = System.nanoTime() - pingNano;
@@ -70,7 +76,7 @@ public class EventHandler extends Thread {
 
                 //MainWindow.getLock().notifyAll();
                 //}
-            } catch (InterruptedException e) {
+            } catch (InterruptedException ignored) {
 
             }
 
@@ -100,11 +106,17 @@ public class EventHandler extends Thread {
 
         if(state.equals(ServerState.LEAVE_LOBBY_SUCCESS)){
             this.parent.getMatchmakingPanel().getLobbyPanel().leaveLobby();
+            return;
         }
 
-        if(state.equals(ServerState.GAME_START_SUCCESS)){
-            this.parent.getMatchmakingPanel().setEnabled(false);
-            this.parent.getMatchmakingPanel().setVisible(false);
+        if(state.equals(ServerState.GAME_START_SUCCESS_WHITE)){
+            this.parent.gameStartCallback("WHITE");
+            return;
+        }
+
+        if(state.equals(ServerState.GAME_START_SUCCESS_BLACK)){
+            this.parent.gameStartCallback("BLACK");
+            return;
         }
     }
 
@@ -137,7 +149,10 @@ public class EventHandler extends Thread {
             case "JIN_LBY_FUL" : return ServerState.JOIN_LOBBY_FAIL_LOBBY_FULL;
             case "LEV_LBY_SUC" : return ServerState.LEAVE_LOBBY_SUCCESS;
             case "GAM_STA_FAI" : return ServerState.GAME_START_FAILED;
-            case "GAM_STA_SUC" : return ServerState.GAME_START_SUCCESS;
+            case "GAM_STA_SUC_WHI" : return ServerState.GAME_START_SUCCESS_WHITE;
+            case "GAM_STA_SUC_BLA" : return ServerState.GAME_START_SUCCESS_BLACK;
+            case "WHITE_TURN"  : return ServerState.WHITE_PLAYER_TURN;
+            case "BLACK_TURN"  : return ServerState.BLACK_PLAYER_TURN;
             default: return ServerState.UNKNOWN;
         }
     }

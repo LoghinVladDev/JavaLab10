@@ -235,7 +235,7 @@ public class LobbiesPanel extends JPanel {
                     //System.out.println(lobby);
                 }
 
-                if(
+                /*if(
                         this.lobbyExists(lobby) &&
                         this.parent.getLobbyPanel().getLobby() != null &&
                         this.parent.getLobbyPanel().getLobby().getCreator().equals(this.parent.getParent().getUsername()) && (
@@ -248,12 +248,27 @@ public class LobbiesPanel extends JPanel {
                     // TODO : doesn't work, why?
 
                     this.parent.getLobbyPanel().getLobby().setOtherPlayer(lobby.getOtherPlayer());
+                }*/
+
+                if (this.parent.getLobbyPanel().getLobby() != null && this.parent.getLobbyPanel().getLobby().getCreator().equals(lobby.getCreator())) {
+                    System.out.println("Found Active Lobby With same creator but different Other Player");
+                    this.parent.getLobbyPanel().setLobbyOtherPlayer(lobby.getOtherPlayer());
+                    this.parent.getLobbyPanel().getLobby().setOtherPlayer(lobby.getOtherPlayer());
                 }
+
+
             }
 
         for(int i = 0; i < this.lobbiesListModel.size(); i++)
-            if(!list.contains(new Lobby(this.lobbiesListModel.get(i))))
-                this.lobbiesListModel.remove(i);
+            if(list != null && !list.isEmpty())
+                if(!list.contains(new Lobby(this.lobbiesListModel.get(i))))
+                    this.lobbiesListModel.remove(i);
+
+        if(list == null)
+            this.lobbiesListModel.clear();
+        else
+            if(list.isEmpty())
+                this.lobbiesListModel.clear();
     }
 
     private List<Lobby> decodeJSONLobbies(String json){

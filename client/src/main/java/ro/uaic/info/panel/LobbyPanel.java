@@ -63,6 +63,10 @@ public class LobbyPanel extends JPanel{
     }
 
     private void sendStartGame(){
+        System.out.println("Pressed Start Game");
+
+        System.out.println(this.getLobby().getOtherPlayer());
+
         if(this.getLobby().getOtherPlayer() == null)
             return;
 

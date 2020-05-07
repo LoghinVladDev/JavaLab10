@@ -22,6 +22,8 @@ public class ClientThread extends Thread {
     private String opponent;
     private ClientThread opponentThread;
 
+    private GameThread gameThread;
+
     private MatchmakingResources matchmakingResources;
     private ServerResources      serverResources;
 
@@ -31,6 +33,18 @@ public class ClientThread extends Thread {
 
     public String getUsername() {
         return this.username;
+    }
+
+    public ClientThread getOpponentClientThread() {
+        return opponentThread;
+    }
+
+    public GameThread getGameThread() {
+        return gameThread;
+    }
+
+    public Connection getConnection() {
+        return connection;
     }
 
     public ClientThread(Socket socket, int threadID, MatchmakingResources matchmakingResources, ServerResources serverResources){
@@ -112,11 +126,16 @@ public class ClientThread extends Thread {
             if(lobby.getCreator().equals(this.username)){
                 for(ClientThread thread : this.serverResources.getThreadList()){
                     if(lobby.getOtherPlayer().equals(thread.username)){
-                        this.connection.writeMessage("GAM_STA_SUC");
+                        this.connection.writeMessage("GAM_STA_SUC_WHI");
                         this.opponent = thread.username;
+                        this.opponentThread = thread;
                         thread.signalToStartGame(this, this.username);
 
                         System.out.println(this.username + " wants to start a game agains " + this.opponent);
+
+                        this.gameThread = new GameThread(this);
+                        this.gameThread.setColour("WHITE");
+                        //this.gameThread.setTurnActive(true);
                     }
                 }
             }
@@ -126,9 +145,13 @@ public class ClientThread extends Thread {
     public void signalToStartGame(ClientThread opponentThread, String opponent){
         System.out.println(this.username + " will be placed in a game against " + opponent);
 
-        this.connection.writeMessage("GAM_STA_SUC");
+        this.connection.writeMessage("GAM_STA_SUC_BLA");
         this.opponent = opponent;
         this.opponentThread = opponentThread;
+
+        this.gameThread = new GameThread(this);
+        this.gameThread.setColour("BLACK");
+        //this.gameThread.setTurnActive(false);
     }
 
     public void treatState(ClientState state){
@@ -150,6 +173,12 @@ public class ClientThread extends Thread {
                 System.out.println("Received nothing. Client DC");
                 break;
             }
+
+            if(this.gameThread != null)
+                if(this.gameThread.isGameActive()){
+                    this.gameThread.treatMessage(message);
+                    continue;
+                }
 
             System.out.println("Received Message ... " + message);
 

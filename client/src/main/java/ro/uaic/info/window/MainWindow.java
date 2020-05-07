@@ -1,8 +1,10 @@
 package ro.uaic.info.window;
 
 import com.mifmif.common.regex.Main;
+import ro.uaic.info.game.Player;
 import ro.uaic.info.net.Connection;
 import ro.uaic.info.net.state.ClientState;
+import ro.uaic.info.panel.GamePanel;
 import ro.uaic.info.panel.MatchmakingPanel;
 import ro.uaic.info.window.state.ConnectionWindowStates;
 import ro.uaic.info.window.state.MessageWindowStates;
@@ -30,7 +32,10 @@ public class MainWindow extends JFrame {
     private String connectionStatus;
     private String ping = "0";
 
+    private Player player;
+
     private MatchmakingPanel matchmakingPanel;
+    private GamePanel gamePanel;
 
     private JLabel connectionLabel;
     private JLabel usernameLabel;
@@ -57,6 +62,23 @@ public class MainWindow extends JFrame {
 
     public MainWindow(){
 
+    }
+
+    public void gameStartCallback(String colour){
+        this.matchmakingPanel.setEnabled(false);
+        this.matchmakingPanel.setVisible(false);
+        this.setPlayer(
+                new Player().setColour(colour)
+        );
+
+        this.gamePanel = new GamePanel(this);
+
+        this.buildLayout(true);
+    }
+
+    public void setPlayer(Player player){
+        this.player = player;
+        this.usernameLabel.setText(this.usernameLabel.getText() + " (" + this.player.getColour() + ")");
     }
 
     public void setConnectionStatus(String status){
@@ -109,7 +131,7 @@ public class MainWindow extends JFrame {
         this.waitForConnection();
 
         this.buildComponents();
-        this.buildLayout();
+        this.buildLayout(false);
 
         this.setVisible(true);
 
@@ -137,7 +159,7 @@ public class MainWindow extends JFrame {
         this.matchmakingPanel   = new MatchmakingPanel(this); // TODO: add here
     }
 
-    private void buildLayout(){
+    private void buildLayout(boolean redrawForGame){
         GroupLayout groupLayout = new GroupLayout(this.getContentPane());
         this.getContentPane().setLayout(groupLayout);
 
@@ -152,7 +174,7 @@ public class MainWindow extends JFrame {
                     .addComponent(this.usernameLabel, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(this.pingLabel, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 )
-                .addComponent(this.matchmakingPanel)
+                .addComponent(redrawForGame ? this.gamePanel :  this.matchmakingPanel)
         );
 
         groupLayout.setVerticalGroup(
@@ -162,7 +184,7 @@ public class MainWindow extends JFrame {
                     .addComponent(this.usernameLabel)
                     .addComponent(this.pingLabel)
                 )
-                .addComponent(this.matchmakingPanel)
+                .addComponent(redrawForGame ? this.gamePanel : this.matchmakingPanel)
         );
     }
 
