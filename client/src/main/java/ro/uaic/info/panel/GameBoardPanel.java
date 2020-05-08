@@ -177,6 +177,7 @@ public class GameBoardPanel extends JPanel {
                         this.offsetY / 2 + squareSize * DEFAULT_BOARD_HEIGHT - squareSize / 2
                 );
             }
+            init = false;
         }
         for(int i = 0; i < this.getGameBoard().getHeight(); i++){
             for(int j = 0; j < this.getGameBoard().getWidth(); j++){
