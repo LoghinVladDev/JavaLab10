@@ -139,6 +139,15 @@ public class EventHandler extends Thread {
         }
         if(state.equals(ServerState.SENDING_BOARD)){
             this.parent.getGamePanel().getGameBoardPanel().getJSONEncodedMatrix(this.parent.getConnection().readMessage());
+            return;
+        }
+        if(state.equals(ServerState.WHITE_PLAYER_VICTORY)){
+            this.parent.triggerVictory("WHITE");
+            return;
+        }
+        if(state.equals(ServerState.BLACK_PLAYER_VICTORY)){
+            this.parent.triggerVictory("BLACK");
+            return;
         }
 
         this.threadLock = false;
@@ -147,6 +156,10 @@ public class EventHandler extends Thread {
     public synchronized void treatServerFail(){
         this.parent.setConnectionStatus("Server down!");
         this.parent.setPing(0);
+    }
+
+    public boolean containsMessage(String message){
+        return this.messageQueue.contains(message);
     }
 
     public void addToMessageQueue(ClientState state){
@@ -181,6 +194,8 @@ public class EventHandler extends Thread {
             case "BLACK_TURN"  : return ServerState.BLACK_PLAYER_TURN;
             case "GET_PIE"     : return ServerState.WAITING_FOR_PIECE_LOCATION;
             case "SND_MAP"     : return ServerState.SENDING_BOARD;
+            case "VIC_WHI"     : return ServerState.WHITE_PLAYER_VICTORY;
+            case "VIC_BLA"     : return ServerState.BLACK_PLAYER_VICTORY;
             default: return ServerState.UNKNOWN;
         }
     }

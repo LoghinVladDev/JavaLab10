@@ -58,6 +58,17 @@ public class MainWindow extends JFrame {
         return this;
     }
 
+    public void triggerVictory(String playerColour){
+        this.getGamePanel().getGameStatusPanel().getTurnLabel().setText(playerColour + " wins!");
+        try {
+            this.messageHandler.join();
+        }
+        catch (InterruptedException ignored){
+
+        }
+    }
+
+
     public boolean isLobbyCreated() {
         return this.lobbyCreated;
     }

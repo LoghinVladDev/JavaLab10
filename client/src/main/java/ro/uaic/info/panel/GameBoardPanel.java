@@ -211,10 +211,13 @@ public class GameBoardPanel extends JPanel {
         return horizontalOffset;
     }
 
+    private boolean lockClick = false;
+
     public void drawToken(int x, int y){
         System.out.println(x  + ", " + y);
 
-        if(this.isTurn()){
+        if(this.isTurn() && !this.parent.getParent().getMessageHandler().containsMessage("PUT_PIE") && !lockClick){
+            lockClick = true;
             Point circleMiddle = new Point(
                 this.horizontalOffset + this.squareSize * x + this.squareSize/2,
                 this.offsetY/2 + this.squareSize * y + this.squareSize/2
@@ -222,6 +225,7 @@ public class GameBoardPanel extends JPanel {
 
             this.parent.getParent().getMessageHandler().addToMessageQueue(ClientState.PUT_PIECE);
             this.parent.getParent().getMessageHandler().addToMessageQueue("{" + x + "," + y + "}");
+            lockClick = false;
         }
     }
 

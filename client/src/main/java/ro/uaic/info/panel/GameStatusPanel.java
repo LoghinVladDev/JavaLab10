@@ -16,6 +16,14 @@ public class GameStatusPanel extends JPanel {
     private int panelWidth;
     private int panelHeight;
 
+    public JLabel getTurnLabel() {
+        return turnLabel;
+    }
+
+    public void setTurnLabel(JLabel turnLabel) {
+        this.turnLabel = turnLabel;
+    }
+
     @Override
     public GamePanel getParent() {
         return parent;

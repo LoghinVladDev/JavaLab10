@@ -45,4 +45,73 @@ public class Board {
         }
         return sb.append("]}").toString();
     }
+
+    public boolean inMatrix(int i, int j, int n, int m){
+        return i >= 0 && i < n && j >= 0 && j < m;
+    }
+
+    public int checkForPlayerVictory(int x, int y){
+        int n = this.board.length;
+        int m = this.board[0].length;
+
+        System.out.println("stuck in ... ");
+
+        for(int i = y, j = x, pieceCount = 0, token = this.board[y][x]; inMatrix(i,j,n,m); i--, j--){
+            System.out.println("stuck in ... 1 ");
+            if(this.board[i][j] == token)
+                pieceCount++;
+            if(pieceCount == 5)
+                return token;
+        }
+        for(int i = y, j = x, pieceCount = 0, token = this.board[y][x]; inMatrix(i,j,n,m); i--){
+            System.out.println("stuck in ... 2 ");
+            if(this.board[i][j] == token)
+                pieceCount++;
+            if(pieceCount == 5)
+                return token;
+        }
+        for(int i = y, j = x, pieceCount = 0, token = this.board[y][x]; inMatrix(i,j,n,m); i--, j++){
+            System.out.println("stuck in ... 3 ");
+            if(this.board[i][j] == token)
+                pieceCount++;
+            if(pieceCount == 5)
+                return token;
+        }
+        for(int i = y, j = x, pieceCount = 0, token = this.board[y][x]; inMatrix(i,j,n,m);  j++){
+            System.out.println("stuck in ... 4 ");
+            if(this.board[i][j] == token)
+                pieceCount++;
+            if(pieceCount == 5)
+                return token;
+        }
+        for(int i = y, j = x, pieceCount = 0, token = this.board[y][x]; inMatrix(i,j,n,m); i++, j++){
+            System.out.println("stuck in ... 5 ");
+            if(this.board[i][j] == token)
+                pieceCount++;
+            if(pieceCount == 5)
+                return token;
+        }
+        for(int i = y, j = x, pieceCount = 0, token = this.board[y][x]; inMatrix(i,j,n,m); i++){
+            System.out.println("stuck in ... 6 ");
+            if(this.board[i][j] == token)
+                pieceCount++;
+            if(pieceCount == 5)
+                return token;
+        }
+        for(int i = y, j = x, pieceCount = 0, token = this.board[y][x]; inMatrix(i,j,n,m); i++, j--){
+            System.out.println("stuck in ... 7 ");
+            if(this.board[i][j] == token)
+                pieceCount++;
+            if(pieceCount == 5)
+                return token;
+        }
+        for(int i = y, j = x, pieceCount = 0, token = this.board[y][x]; inMatrix(i,j,n,m); j--) {
+            System.out.println("stuck in ... 8 ");
+            if (this.board[i][j] == token)
+                pieceCount++;
+            if (pieceCount == 5)
+                return token;
+        }
+        return 0;
+    }
 }

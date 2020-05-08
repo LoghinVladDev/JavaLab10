@@ -118,6 +118,19 @@ public class GameThread {
         this.sendMap = true;
         this.opponentThread.getGameThread().sendMap = true;
 
+        int victory = this.getBoard().checkForPlayerVictory(x, y);
+
+        if(victory == Board.WHITE) {
+            this.currentThread.getConnection().writeMessage("VIC_WHI");
+            this.opponentThread.getConnection().writeMessage("VIC_WHI");
+            this.gameActive = false;
+        }
+        if(victory == Board.BLACK){
+            this.currentThread.getConnection().writeMessage("VIC_BLA");
+            this.opponentThread.getConnection().writeMessage("VIC_BLA");
+            this.gameActive = false;
+        }
+
         this.currentThread.getConnection().writeMessage("SER_ACK");
     }
 
