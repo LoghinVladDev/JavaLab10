@@ -31,7 +31,7 @@ public class Board {
                 .append(this.board == null ? 0 : this.board.length)
                 .append(",")
                 .append(this.board == null ? 0 : (this.board[0] == null ? 0 : this.board[0].length))
-                .append(",[");
+                .append(";[");
         for(int i = 0, height = this.board == null ? 0 : this.board.length; i < height; i++){
             sb.append('[');
             for(int j = 0, width = this.board[i] == null ? 0 : this.board[i].length; j < width; j++){

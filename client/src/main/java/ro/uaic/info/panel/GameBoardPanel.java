@@ -133,25 +133,28 @@ public class GameBoardPanel extends JPanel {
                 )
         );
 
-        this.gameBoard = new Board(GameBoardPanel.DEFAULT_BOARD_WIDTH, GameBoardPanel.DEFAULT_BOARD_HEIGHT);
+        this.gameBoard = new Board(GameBoardPanel.DEFAULT_BOARD_WIDTH, GameBoardPanel.DEFAULT_BOARD_HEIGHT, this);
     }
 
+    private boolean init = true;
+
     public void paintComponent(Graphics graphics){
-        graphics.setColor(Color.BLACK);
+        if(init) {
+            graphics.setColor(Color.BLACK);
 
-        //graphics.drawLine(this.panelWidth, 0, this.panelWidth, this.panelHeight); PANEL FINISH
+            //graphics.drawLine(this.panelWidth, 0, this.panelWidth, this.panelHeight); PANEL FINISH
 
-        for(int i = 0; i < this.gameBoard.getHeight(); i++){
-            //System.out.println(i);
-            graphics.drawLine(
-                    horizontalOffset + squareSize / 2,
-                    this.offsetY/2 + squareSize * i + squareSize / 2,
-                    horizontalOffset + squareSize * DEFAULT_BOARD_WIDTH - squareSize / 2,
-                    this.offsetY/2 + squareSize * i + squareSize / 2
-            );
-        }
+            for (int i = 0; i < this.gameBoard.getHeight(); i++) {
+                //System.out.println(i);
+                graphics.drawLine(
+                        horizontalOffset + squareSize / 2,
+                        this.offsetY / 2 + squareSize * i + squareSize / 2,
+                        horizontalOffset + squareSize * DEFAULT_BOARD_WIDTH - squareSize / 2,
+                        this.offsetY / 2 + squareSize * i + squareSize / 2
+                );
+            }
 
-        System.out.println((horizontalOffset + squareSize / 2) + ", " + (this.offsetY + squareSize/2));
+            System.out.println((horizontalOffset + squareSize / 2) + ", " + (this.offsetY + squareSize / 2));
 
         /* upperLeft = new Point(horizontalOffset, this.offsetY);
         Point upperRight = new Point(horizontalOffset + squareSize, this.offsetY);
@@ -166,15 +169,15 @@ public class GameBoardPanel extends JPanel {
                 lowerRight + "\n"
         );*/
 
-        for(int j = 0; j < this.gameBoard.getWidth(); j++){
-            graphics.drawLine(
-                    horizontalOffset + squareSize * j + squareSize/2,
-                    this.offsetY/2 + squareSize / 2,
-                    horizontalOffset + squareSize * j + squareSize/2,
-                    this.offsetY/2 + squareSize * DEFAULT_BOARD_HEIGHT - squareSize/2
-            );
+            for (int j = 0; j < this.gameBoard.getWidth(); j++) {
+                graphics.drawLine(
+                        horizontalOffset + squareSize * j + squareSize / 2,
+                        this.offsetY / 2 + squareSize / 2,
+                        horizontalOffset + squareSize * j + squareSize / 2,
+                        this.offsetY / 2 + squareSize * DEFAULT_BOARD_HEIGHT - squareSize / 2
+                );
+            }
         }
-
         for(int i = 0; i < this.getGameBoard().getHeight(); i++){
             for(int j = 0; j < this.getGameBoard().getWidth(); j++){
                 Point squareMiddle = new Point(
@@ -182,9 +185,17 @@ public class GameBoardPanel extends JPanel {
                         this.offsetY/2 + this.getSquareSize() * i + this.getSquareSize()/2
                 );
 
+                if(this.getGameBoard().getPieceOn(j, i) > 0){
+                    graphics.setColor(this.getGameBoard().getPieceOn(j,i) == Board.WHITE ? Color.GRAY : Color.BLACK);
+
+                    graphics.fillOval(squareMiddle.x-squareSize/2, squareMiddle.y-squareSize/2, squareSize - 3, squareSize - 3);
+                }
+
                 //System.out.println(squareMiddle + ", " + i + ", " + j);
             }
         }
+
+
     }
 
     public Board getGameBoard() {
@@ -215,6 +226,7 @@ public class GameBoardPanel extends JPanel {
 
     public void getJSONEncodedMatrix(String matrixJSON){
         System.out.println("...map changed... " + matrixJSON);
+        this.getGameBoard().setEncodedBoard(matrixJSON);
     }
 
     private void buildLayout(){

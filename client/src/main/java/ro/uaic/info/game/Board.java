@@ -1,5 +1,7 @@
 package ro.uaic.info.game;
 
+import ro.uaic.info.panel.GameBoardPanel;
+
 public class Board {
     private int[][] board;
 
@@ -7,8 +9,11 @@ public class Board {
     public static final int WHITE = 1;
     public static final int BLACK = 2;
 
-    public Board(int width, int height){
+    private GameBoardPanel parent;
+
+    public Board(int width, int height, GameBoardPanel parent) {
         this.board = new int[height][width];
+        this.parent = parent;
     }
 
     public int[][] getBoard() {
@@ -29,5 +34,28 @@ public class Board {
         if(this.board != null)
             return this.board.length;
         return 0;
+    }
+
+    public void setEncodedBoard(String JSONBoard){
+        String[] properties = JSONBoard.split(";");
+        int height = Integer.parseInt(properties[0].split(",")[0].replace("{", ""));
+        int width = Integer.parseInt(properties[0].split(",")[1]);
+
+        String[] matArray = properties[1].split(",");
+
+        for(int i = 0; i < height; i++){
+            for(int j = 0; j < width; j++){
+                this.board[i][j] = Integer.parseInt(
+                        matArray[i * width + j]
+                                .replace("[","")
+                                .replace("[","")
+                                .replace("]", "")
+                                .replace("]", "")
+                                .replace("}", "")
+                );
+            }
+        }
+
+        this.parent.getParent().repaint();
     }
 }

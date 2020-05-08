@@ -10,7 +10,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class EventHandler extends Thread {
-    public static final int DEFAULT_TICK_RATE = 1;
+    public static final int DEFAULT_TICK_RATE = 16;
 
     private  Queue<String> messageQueue = new LinkedList<>();
     private int tickRate = DEFAULT_TICK_RATE;
@@ -20,6 +20,8 @@ public class EventHandler extends Thread {
     private MainWindow parent;
 
     private boolean enableStop = false;
+
+    private boolean threadLock = false;
 
     public EventHandler(MainWindow parent){
         this.parent = parent;
@@ -44,6 +46,8 @@ public class EventHandler extends Thread {
                 }
 
                 System.out.println(messageQueue);
+
+                while(this.threadLock);
 
                 if (this.messageQueue.peek().equals("CLI_STP"))
                     this.enableStop = true;
@@ -87,6 +91,8 @@ public class EventHandler extends Thread {
     public synchronized void treatServerResponse(ServerState state){
         System.out.println("Received state : " + state);
 
+        //this.threadLock = true;
+
         if(state.equals(ServerState.SENDING_MATCH_LIST)){
             String lobbyListString = this.parent.getConnection().readMessage();
             System.out.println(lobbyListString);
@@ -120,27 +126,22 @@ public class EventHandler extends Thread {
         }
 
         if(state.equals(ServerState.BLACK_PLAYER_TURN)){
-            if(this.parent.getGamePanel().getGameBoardPanel().getTokenColour().equals("BLACK") && !this.parent.getGamePanel().getGameBoardPanel().isTurn()){
-                this.parent.getConnection().writeMessage("REQ_BRD");
-                this.parent.getGamePanel().getGameBoardPanel().getJSONEncodedMatrix(this.parent.getConnection().readMessage());
-            }
-
             this.parent.getGamePanel().getGameBoardPanel().setTurn(
                     this.parent.getGamePanel().getGameBoardPanel().getTokenColour().equals("BLACK")
             );
             return;
         }
         if(state.equals(ServerState.WHITE_PLAYER_TURN)){
-            if(this.parent.getGamePanel().getGameBoardPanel().getTokenColour().equals("WHITE") && !this.parent.getGamePanel().getGameBoardPanel().isTurn()){
-                this.parent.getConnection().writeMessage("REQ_BRD");
-                this.parent.getGamePanel().getGameBoardPanel().getJSONEncodedMatrix(this.parent.getConnection().readMessage());
-            }
-
             this.parent.getGamePanel().getGameBoardPanel().setTurn(
                     this.parent.getGamePanel().getGameBoardPanel().getTokenColour().equals("WHITE")
             );
             return;
         }
+        if(state.equals(ServerState.SENDING_BOARD)){
+            this.parent.getGamePanel().getGameBoardPanel().getJSONEncodedMatrix(this.parent.getConnection().readMessage());
+        }
+
+        this.threadLock = false;
     }
 
     public synchronized void treatServerFail(){
@@ -179,6 +180,7 @@ public class EventHandler extends Thread {
             case "WHITE_TURN"  : return ServerState.WHITE_PLAYER_TURN;
             case "BLACK_TURN"  : return ServerState.BLACK_PLAYER_TURN;
             case "GET_PIE"     : return ServerState.WAITING_FOR_PIECE_LOCATION;
+            case "SND_MAP"     : return ServerState.SENDING_BOARD;
             default: return ServerState.UNKNOWN;
         }
     }

@@ -43,6 +43,8 @@ public class MainWindow extends JFrame {
 
     private boolean lobbyCreated = false;
 
+    private JPanel mainPanel;
+
     private static Object lock = new Object();
 
     public static Object getLock() {
@@ -72,18 +74,23 @@ public class MainWindow extends JFrame {
         return gamePanel;
     }
 
+    private boolean retartedFunctionLock = false;
+
     public void gameStartCallback(String colour){
-        this.matchmakingPanel.setEnabled(false);
-        this.matchmakingPanel.setVisible(false);
-        this.setPlayer(
-                new Player().setColour(colour)
-        );
+        if(!this.retartedFunctionLock){
+            this.retartedFunctionLock = true;
+            this.matchmakingPanel.setEnabled(false);
+            this.matchmakingPanel.setVisible(false);
+            this.setPlayer(
+                    new Player().setColour(colour)
+            );
 
-        this.gamePanel = new GamePanel(this);
-        this.gamePanel.getGameBoardPanel().setTokenColour(colour);
-        this.gamePanel.getGameBoardPanel().setTurn(colour.equals("WHITE"));
+            this.gamePanel = new GamePanel(this);
+            this.gamePanel.getGameBoardPanel().setTokenColour(colour);
+            this.gamePanel.getGameBoardPanel().setTurn(colour.equals("WHITE"));
 
-        this.buildLayout(true);
+            this.buildLayout(true);
+        }
     }
 
     public void setPlayer(Player player){
@@ -190,11 +197,24 @@ public class MainWindow extends JFrame {
     }
 
     private void buildLayout(boolean redrawForGame){
-        if(redrawForGame)
-            this.setContentPane(new JPanel());
+        if(this.mainPanel != null)
+            this.getContentPane().remove(this.mainPanel);
 
-        GroupLayout groupLayout = new GroupLayout(this.getContentPane());
-        this.getContentPane().setLayout(groupLayout);
+        if(!redrawForGame){
+            this.mainPanel = new JPanel();
+        }
+        else {
+            this.mainPanel = new JPanel() {
+                public void paintComponent(Graphics g) {
+                    gamePanel.paintComponent(g);
+                }
+            };
+        }
+
+        GroupLayout groupLayout = new GroupLayout(this.mainPanel);
+        this.mainPanel.setLayout(groupLayout);
+
+        this.getContentPane().add(this.mainPanel);
 
         groupLayout.setHorizontalGroup(
             groupLayout.createParallelGroup(GroupLayout.Alignment.LEADING)

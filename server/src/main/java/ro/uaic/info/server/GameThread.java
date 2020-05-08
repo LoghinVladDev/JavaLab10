@@ -12,6 +12,8 @@ public class GameThread {
 
     private boolean gameActive = false;
 
+    private boolean sendMap = false;
+
     private boolean turnActive;
     private String colour;
 
@@ -76,27 +78,45 @@ public class GameThread {
     }
 
     public void sendTurnStatus(){
+        if(this.sendMap){
+            this.currentThread.getConnection().writeMessage("SND_MAP");
+            this.currentThread.getConnection().writeMessage(this.getBoard().toString());
+            this.sendMap = false;
+            return;
+        }
+
         this.currentThread.getConnection().writeMessage(
                 this.turnActive ?
                         (this.colour.toUpperCase() + "_TURN") :
                         (this.opponentThread.getGameThread().colour.toUpperCase() + "_TURN"));
     }
 
+    public void setSendMap(boolean sendMap) {
+        this.sendMap = sendMap;
+    }
+
+    public boolean isSendMap() {
+        return sendMap;
+    }
+
     public void sendBoard(){
-        this.currentThread.getConnection().writeMessage(this.board.toString());
+        this.currentThread.getConnection().writeMessage(this.getBoard().toString());
     }
 
     public void putPiece(){
         this.currentThread.getConnection().writeMessage("GET_PIE");
+
         String pieceLocation = this.currentThread.getConnection().readMessage();
 
         int x = Integer.parseInt(pieceLocation.split(",")[0].replace("{", ""));
         int y = Integer.parseInt(pieceLocation.split(",")[1].replace("}",""));
 
-        this.board.putPiece(x, y, this.colour.equals("WHITE") ? Board.WHITE : Board.BLACK);
+        this.getBoard().putPiece(x, y, this.colour.equals("WHITE") ? Board.WHITE : Board.BLACK);
 
         this.opponentThread.getGameThread().setTurnActive(this.turnActive);
         this.turnActive = !this.turnActive;
+        this.sendMap = true;
+        this.opponentThread.getGameThread().sendMap = true;
 
         this.currentThread.getConnection().writeMessage("SER_ACK");
     }
